@@ -1,0 +1,617 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>MercaBásica 2026 · CIFP Tony Gallardo</title>
+  <meta name="description" content="MercaBásica 2026, el mercado navideño del CIFP Tony Gallardo hecho por su alumnado. Viernes 11 de diciembre de 2026 en Las Palmas de Gran Canaria. Abierto a la comunidad.">
+  <meta name="theme-color" content="#0A2150">
+  <link rel="canonical" href="https://myappsserver.duckdns.org/mercabasica/">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="es_ES">
+  <meta property="og:title" content="MercaBásica 2026 · 11 de diciembre">
+  <meta property="og:description" content="El CIFP Tony Gallardo se convierte en un mercado navideño hecho por su alumnado. Abierto a la comunidad.">
+  <meta property="og:url" content="https://myappsserver.duckdns.org/mercabasica/">
+  <meta property="og:image" content="https://myappsserver.duckdns.org/mercabasica/assets/img/og-image.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..700&family=Caveat:wght@500..700&family=DM+Mono:wght@400;500&family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..900,0..100,0..1;1,9..144,300..900,0..100,0..1&display=swap">
+  <link rel="preload" as="image" href="assets/img/wordmark.webp" type="image/webp">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <script src="assets/js/main.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#contenido">Saltar al contenido</a>
+
+  <!-- Filtros SVG compartidos: tinta de sello y brillo de bombillas -->
+  <svg class="defs" aria-hidden="true" focusable="false">
+    <defs>
+      <filter id="ink" x="-5%" y="-5%" width="110%" height="110%">
+        <feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" seed="7" result="noise"/>
+        <feColorMatrix in="noise" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -1.7 1.62" result="holes"/>
+        <feComposite in="SourceGraphic" in2="holes" operator="in" result="inked"/>
+        <feTurbulence type="fractalNoise" baseFrequency=".04" numOctaves="1" seed="2" result="warp"/>
+        <feDisplacementMap in="inked" in2="warp" scale="3" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+      <filter id="glow" x="-150%" y="-150%" width="400%" height="400%">
+        <feGaussianBlur stdDeviation="9"/>
+      </filter>
+    </defs>
+  </svg>
+
+  <!-- La barra del puesto: navegación -->
+  <header class="beam" data-beam>
+    <a class="beam__brand" href="#inicio" aria-label="MercaBásica 2026, ir al inicio">
+      <span class="beam__word" aria-hidden="true"></span>
+      <span class="beam__yr" aria-hidden="true">26</span>
+    </a>
+    <nav class="beam__nav" aria-label="Secciones">
+      <a href="#que-es">Qué es</a>
+      <a href="#programa">Programa</a>
+      <a href="#recorrido">Recorrido</a>
+      <a href="#panateca">Panateca</a>
+      <a href="#encendido">Encendido</a>
+      <a href="#visita">Cómo llegar</a>
+    </nav>
+    <a class="beam__lights" href="#encendido" aria-label="Ir al encendido navideño">
+      <svg viewBox="0 0 96 26" aria-hidden="true">
+        <path d="M2 4Q48 22 94 4" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".55"/>
+        <g class="mini"><rect x="10.6" y="6.5" width="2.8" height="2.6" rx=".6"/><ellipse class="mini__b" style="--c:#FFD27A" cx="12" cy="12.6" rx="2.6" ry="3.6"/></g>
+        <g class="mini"><rect x="25.6" y="10.1" width="2.8" height="2.6" rx=".6"/><ellipse class="mini__b" style="--c:#FF6B5B" cx="27" cy="16.2" rx="2.6" ry="3.6"/></g>
+        <g class="mini"><rect x="40.6" y="11.8" width="2.8" height="2.6" rx=".6"/><ellipse class="mini__b" style="--c:#7FD3A0" cx="42" cy="17.9" rx="2.6" ry="3.6"/></g>
+        <g class="mini"><rect x="54.6" y="11.7" width="2.8" height="2.6" rx=".6"/><ellipse class="mini__b" style="--c:#6FB6FF" cx="56" cy="17.8" rx="2.6" ry="3.6"/></g>
+        <g class="mini"><rect x="69.6" y="9.7" width="2.8" height="2.6" rx=".6"/><ellipse class="mini__b" style="--c:#FF9EC0" cx="71" cy="15.8" rx="2.6" ry="3.6"/></g>
+        <g class="mini"><rect x="84.6" y="5.9" width="2.8" height="2.6" rx=".6"/><ellipse class="mini__b" style="--c:#FFE9A8" cx="86" cy="12" rx="2.6" ry="3.6"/></g>
+      </svg>
+      <span class="beam__date">11·12·26</span>
+    </a>
+    <button class="beam__menu" type="button" aria-expanded="false" aria-controls="menu" data-menu-btn>
+      <span class="beam__menu-label">Menú</span><span class="beam__burger" aria-hidden="true"></span>
+    </button>
+  </header>
+
+  <nav class="menu" id="menu" aria-label="Menú" hidden data-menu>
+    <a href="#que-es"><small>01</small>Qué es</a>
+    <a href="#programa"><small>02</small>Programa</a>
+    <a href="#recorrido"><small>03</small>Recorrido</a>
+    <a href="#panateca"><small>04</small>Panateca</a>
+    <a href="#encendido"><small>05</small>Encendido</a>
+    <a href="#carteles"><small>06</small>Carteles</a>
+    <a href="#visita"><small>07</small>Cómo llegar</a>
+    <p class="menu__foot">Viernes 11 de diciembre · CIFP Tony Gallardo</p>
+  </nav>
+
+  <main id="contenido">
+
+    <!-- ============ 00 · PORTADA ============ -->
+    <section class="hero" id="inicio">
+      <div class="awning hero__awning" data-awning data-a="#CC544C" data-b="#FFF8EE" data-seg="74" data-seed="11" data-sway></div>
+
+      <div class="hero__meta">
+        <span>N.º 03 — Tercera edición</span>
+        <span class="hero__meta-mid">Mercado navideño hecho por el alumnado</span>
+        <span>CIFP Tony Gallardo · Las Palmas de G.C.</span>
+      </div>
+
+      <h1 class="hero__title">
+        <img class="hero__word" src="assets/img/wordmark.webp" width="1209" height="382" alt="MercaBásica" fetchpriority="high">
+        <span class="hero__sub">
+          <img class="hero__year" src="assets/img/year.webp" width="460" height="177" alt="2026">
+          <span class="hero__date">
+            <svg class="hero__marker" viewBox="0 0 400 100" preserveAspectRatio="none" aria-hidden="true"><path d="M6 26C40 18 90 22 140 17s120-3 190-5 58-2 66 2l-4 20 6 18-4 26c-64 6-144 2-224 8S50 88 8 90l4-20-8-20z" fill="#FBE36F"/></svg>
+            <img src="assets/img/date.webp" width="716" height="145" alt="11 de diciembre">
+          </span>
+        </span>
+      </h1>
+
+      <div class="hero__foot">
+        <p class="hero__lead">Durante una mañana, el CIFP Tony Gallardo se convierte en un mercado navideño: el alumnado diseña, elabora, vende, cuida y celebra. <em>Tú solo tienes que venir.</em></p>
+
+        <div class="counter" data-countdown>
+          <span class="counter__label" data-countdown-label>Faltan</span>
+          <div class="counter__display" role="timer" aria-live="off" data-countdown-aria>
+            <div class="counter__unit"><span class="seg" data-unit="d"></span><small>días</small></div>
+            <i class="counter__colon" aria-hidden="true"></i>
+            <div class="counter__unit"><span class="seg" data-unit="h"></span><small>horas</small></div>
+            <i class="counter__colon" aria-hidden="true"></i>
+            <div class="counter__unit"><span class="seg" data-unit="m"></span><small>min</small></div>
+            <i class="counter__colon" aria-hidden="true"></i>
+            <div class="counter__unit"><span class="seg" data-unit="s"></span><small>seg</small></div>
+          </div>
+        </div>
+
+        <div class="tag">
+          <div class="tag__swing">
+            <span class="tag__string" aria-hidden="true"></span>
+            <div class="tag__card">
+              <span class="tag__hand">Abierto a la comunidad</span>
+              <strong>Vie<br>11·12</strong>
+              <span class="tag__mono">desde las 09:30 h</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <a class="hero__cue" href="#obertura"><span>Fundido a negro</span><i aria-hidden="true"></i></a>
+    </section>
+
+    <!-- ============ OBERTURA ============ -->
+    <section class="overture" id="obertura" aria-label="Obertura">
+      <div class="overture__stage" data-overture data-step="0">
+        <p class="overture__time">09:30 h — Obertura emocional</p>
+        <ol class="overture__dots" aria-hidden="true"><li></li><li></li><li></li><li></li><li></li></ol>
+
+        <div class="overture__layer is-active" data-step="0">
+          <p class="ov-silence">Silencio. <span>Pantalla en negro.</span></p>
+        </div>
+        <div class="overture__layer" data-step="1">
+          <p class="ov-q" data-split>¿Y si la educación pudiera <em>cambiar una vida</em>?</p>
+        </div>
+        <div class="overture__layer" data-step="2">
+          <p class="ov-q ov-q--long" data-split>¿Y si una oportunidad pudiera cambiar la forma en que alguien <em>se ve a sí mismo</em>?</p>
+        </div>
+        <div class="overture__layer" data-step="3">
+          <div class="sheet" data-sheet>
+            <p class="sheet__edge"><span>MB 400 — Hoja de contactos</span><span>Ediciones anteriores</span></p>
+            <ul class="sheet__grid">
+              <li><p>Una mano trabajando la madera</p><span class="sheet__n">07A</span></li>
+              <li><p>Una masa de pan</p><span class="sheet__n">08</span></li>
+              <li><p>Una persona atendiendo</p><span class="sheet__n">08A</span></li>
+              <li class="sheet__pick">
+                <p>Una sonrisa</p><span class="sheet__n">09</span>
+                <svg class="sheet__loop" viewBox="0 0 120 100" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M20 54C14 24 56 8 92 16c26 7 28 50 2 66C64 98 18 90 10 62 6 44 26 26 48 22"/></svg>
+                <span class="sheet__note" aria-hidden="true">esta</span>
+              </li>
+              <li><p>Una mirada</p><span class="sheet__n">09A</span></li>
+              <li><p>Una pieza que se construye</p><span class="sheet__n">10</span></li>
+              <li><p>Una persona ayudando a otra</p><span class="sheet__n">10A</span></li>
+              <li><p>Un grupo trabajando</p><span class="sheet__n">11</span></li>
+              <li><p>Una actividad compartida</p><span class="sheet__n">11A</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="overture__layer" data-step="4">
+          <p class="ov-s" data-split>Entonces, la educación deja de ser solo educación.</p>
+        </div>
+        <div class="overture__layer" data-step="5">
+          <p class="ov-f">Se convierte en <span class="ov-glow">futuro.</span></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 01 · QUÉ ES ============ -->
+    <section class="about" id="que-es">
+      <div class="bunting" data-bunting aria-hidden="true"></div>
+      <div class="wrap">
+        <header class="sec-head">
+          <span class="sec-num">01</span><span>Qué es</span><span class="sec-rule"></span><span class="sec-aside">Del aula al mostrador</span>
+        </header>
+
+        <h2 class="about__title">El gran mercadillo navideño del CIFP Tony Gallardo, <em>hecho por su alumnado.</em></h2>
+
+        <div class="about__grid">
+          <div class="about__text">
+            <p class="dropcap">MercaBásica es un proyecto educativo, inclusivo y abierto a la comunidad. Nació del cambio metodológico de los ciclos de Grado Básico y hoy convierte todo el centro en un auténtico mercado de Navidad.</p>
+            <p>Aquí el alumnado no solo aprende a fabricar un producto. Aprende a ponerle precio, a presentarlo, a venderlo, a atender a quien se acerca y a resolver lo que surja. Situaciones que ningún aula puede reproducir igual.</p>
+            <p>Carpintería, adornos, repostería, talleres, música, cuidados: cada familia profesional pone lo que sabe hacer al servicio de una mañana compartida con familias, profesorado, visitantes y otros centros.</p>
+            <blockquote class="about__quote">La Formación Profesional también se construye haciendo, colaborando y conectándose con la sociedad.</blockquote>
+          </div>
+
+          <div class="notepad" data-reveal="list">
+            <span class="tape" aria-hidden="true"></span>
+            <h3 class="notepad__title">Lista de la compra</h3>
+            <ul class="notepad__list">
+              <li style="--i:0"><svg viewBox="0 0 24 20" aria-hidden="true"><path pathLength="1" d="M2 11l6 6L22 2"/></svg><span>Diseñar el producto</span></li>
+              <li style="--i:1"><svg viewBox="0 0 24 20" aria-hidden="true"><path pathLength="1" d="M2 11l6 6L22 2"/></svg><span>Hacerlo con las manos</span></li>
+              <li style="--i:2"><svg viewBox="0 0 24 20" aria-hidden="true"><path pathLength="1" d="M2 11l6 6L22 2"/></svg><span>Ponerle precio</span></li>
+              <li style="--i:3"><svg viewBox="0 0 24 20" aria-hidden="true"><path pathLength="1" d="M2 11l6 6L22 2"/></svg><span>Montar el puesto y el escaparate</span></li>
+              <li style="--i:4"><svg viewBox="0 0 24 20" aria-hidden="true"><path pathLength="1" d="M2 11l6 6L22 2"/></svg><span>Atender al público</span></li>
+              <li style="--i:5"><svg viewBox="0 0 24 20" aria-hidden="true"><path pathLength="1" d="M2 11l6 6L22 2"/></svg><span>Hacer el tique</span></li>
+              <li style="--i:6"><svg viewBox="0 0 24 20" aria-hidden="true"><path pathLength="1" d="M2 11l6 6L22 2"/></svg><span>Trabajar en equipo</span></li>
+              <li style="--i:7" class="notepad__last"><svg viewBox="0 0 24 20" aria-hidden="true"><path pathLength="1" d="M2 11l6 6L22 2"/></svg><span>Celebrarlo juntos</span></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="about__row">
+          <figure class="postcard" data-reveal>
+            <img src="assets/img/mercado.webp" width="1030" height="670" alt="Ilustración del cartel: tres puestos con toldos de rayas, banderines, dulces y familias paseando." loading="lazy">
+            <figcaption>Así lo soñamos en el cartel.</figcaption>
+            <svg class="postmark" viewBox="0 0 240 120" aria-hidden="true">
+              <defs><path id="pm-top" d="M20 60a40 40 0 0 1 80 0"/><path id="pm-bot" d="M14 60a46 46 0 0 0 92 0"/></defs>
+              <g filter="url(#ink)" fill="none" stroke="currentColor">
+                <circle cx="60" cy="60" r="52" stroke-width="3"/><circle cx="60" cy="60" r="34" stroke-width="1.5"/>
+                <path d="M120 38c15-8 30 8 45 0s30 8 45 0 20 6 26 3M120 52c15-8 30 8 45 0s30 8 45 0 20 6 26 3M120 66c15-8 30 8 45 0s30 8 45 0 20 6 26 3M120 80c15-8 30 8 45 0s30 8 45 0 20 6 26 3" stroke-width="3" stroke-linecap="round"/>
+                <g fill="currentColor" stroke="none" font-family="DM Mono, monospace" font-size="9" letter-spacing="1.6">
+                  <text><textPath href="#pm-top" startOffset="50%" text-anchor="middle">LAS PALMAS G.C.</textPath></text>
+                  <text x="60" y="58" text-anchor="middle" font-size="13" font-weight="500">11 DIC</text>
+                  <text x="60" y="72" text-anchor="middle" font-size="10">2026</text>
+                </g>
+              </g>
+            </svg>
+          </figure>
+
+          <div class="stamps" data-reveal="stamps">
+            <div class="stamp" style="--c:var(--tomato);--r:-8deg;--i:0">
+              <svg viewBox="0 0 200 200" role="img" aria-label="Aprender haciendo. Aprendizaje basado en proyectos.">
+                <defs><path id="st-1" d="M100 100m-73 0a73 73 0 1 1 146 0a73 73 0 1 1-146 0"/></defs>
+                <g filter="url(#ink)">
+                  <circle cx="100" cy="100" r="95" fill="none" stroke="currentColor" stroke-width="5"/>
+                  <circle cx="100" cy="100" r="55" fill="none" stroke="currentColor" stroke-width="2"/>
+                  <text fill="currentColor" font-family="DM Mono, monospace" font-size="14" font-weight="500" letter-spacing="2.4"><textPath href="#st-1">APRENDER HACIENDO · APRENDER HACIENDO ·</textPath></text>
+                  <text x="100" y="113" text-anchor="middle" fill="currentColor" font-family="Fraunces, serif" font-weight="800" font-size="40">ABP</text>
+                </g>
+              </svg>
+            </div>
+            <div class="stamp" style="--c:var(--holly);--r:6deg;--i:1">
+              <svg viewBox="0 0 200 200" role="img" aria-label="Kilómetro cero. Producto de proximidad.">
+                <defs><path id="st-2" d="M100 100m-73 0a73 73 0 1 1 146 0a73 73 0 1 1-146 0"/></defs>
+                <g filter="url(#ink)">
+                  <circle cx="100" cy="100" r="95" fill="none" stroke="currentColor" stroke-width="5"/>
+                  <circle cx="100" cy="100" r="55" fill="none" stroke="currentColor" stroke-width="2"/>
+                  <text fill="currentColor" font-family="DM Mono, monospace" font-size="14" font-weight="500" letter-spacing="2"><textPath href="#st-2">PRODUCTO DE PROXIMIDAD · KILÓMETRO CERO ·</textPath></text>
+                  <text x="100" y="114" text-anchor="middle" fill="currentColor" font-family="Fraunces, serif" font-weight="800" font-size="38">KM 0</text>
+                </g>
+              </svg>
+            </div>
+            <div class="stamp" style="--c:var(--azul);--r:4deg;--i:2">
+              <svg viewBox="0 0 200 200" role="img" aria-label="Hecho a mano por el alumnado, 2026.">
+                <defs><path id="st-3" d="M100 100m-73 0a73 73 0 1 1 146 0a73 73 0 1 1-146 0"/></defs>
+                <g filter="url(#ink)">
+                  <circle cx="100" cy="100" r="95" fill="none" stroke="currentColor" stroke-width="5"/>
+                  <circle cx="100" cy="100" r="55" fill="none" stroke="currentColor" stroke-width="2"/>
+                  <text fill="currentColor" font-family="DM Mono, monospace" font-size="14" font-weight="500" letter-spacing="2.6"><textPath href="#st-3">HECHO A MANO POR EL ALUMNADO · 2026 ·</textPath></text>
+                  <text x="100" y="98" text-anchor="middle" fill="currentColor" font-family="Caveat, cursive" font-weight="700" font-size="30">hecho</text>
+                  <text x="100" y="126" text-anchor="middle" fill="currentColor" font-family="Caveat, cursive" font-weight="700" font-size="30">aquí</text>
+                </g>
+              </svg>
+            </div>
+            <div class="stamp" style="--c:var(--navy);--r:-5deg;--i:3">
+              <svg viewBox="0 0 200 200" role="img" aria-label="Consumo responsable, comercio local.">
+                <defs><path id="st-4" d="M100 100m-73 0a73 73 0 1 1 146 0a73 73 0 1 1-146 0"/></defs>
+                <g filter="url(#ink)">
+                  <circle cx="100" cy="100" r="95" fill="none" stroke="currentColor" stroke-width="5"/>
+                  <circle cx="100" cy="100" r="55" fill="none" stroke="currentColor" stroke-width="2"/>
+                  <text fill="currentColor" font-family="DM Mono, monospace" font-size="14" font-weight="500" letter-spacing="2.2"><textPath href="#st-4">CONSUMO RESPONSABLE · COMERCIO LOCAL ·</textPath></text>
+                  <path d="M100 128c-22-4-26-34 6-54 10 24 8 46-6 54zm0 0c2-16 4-30 6-54" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+                </g>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="turns">
+          <h3 class="turns__title">Tres ediciones, <em>un mismo mostrador</em></h3>
+          <ol class="turns__list" data-reveal="turns">
+            <li class="ticket" style="--i:0">
+              <p class="ticket__head"><span>Su turno</span><span>2024</span></p>
+              <p class="ticket__num">01</p>
+              <p class="ticket__txt"><strong>Primera edición.</strong> Nace en los ciclos de Grado Básico, con el aprendizaje basado en proyectos como motor.</p>
+            </li>
+            <li class="ticket" style="--i:1">
+              <p class="ticket__head"><span>Su turno</span><span>2025</span></p>
+              <p class="ticket__num">02</p>
+              <p class="ticket__txt"><strong>Segunda edición.</strong> Se suman otras familias profesionales, otros niveles y otros centros educativos.</p>
+            </li>
+            <li class="ticket ticket--now" style="--i:2">
+              <p class="ticket__head"><span>Su turno</span><span>2026</span></p>
+              <p class="ticket__num">03</p>
+              <p class="ticket__txt"><strong>Tercera edición.</strong> Llega Panateca, el centro entero se enciende… y ahora te toca a ti.</p>
+              <span class="ticket__note" aria-hidden="true">¡el tuyo!</span>
+            </li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 02 · PROGRAMA ============ -->
+    <section class="program" id="programa">
+      <div class="wrap program__grid">
+        <div class="program__intro">
+          <header class="sec-head"><span class="sec-num">02</span><span>Programa</span><span class="sec-rule"></span></header>
+          <h2 class="program__title">El tique <em>del día</em></h2>
+          <p class="program__lead">Viernes 11 de diciembre. De la primera voz de la TonyBand a la última foto de familia: esto es todo lo que entra en tu mañana.</p>
+          <p class="program__small">Horario orientativo, según la escaleta del acto.</p>
+        </div>
+
+        <div class="printer" data-printer>
+          <div class="printer__slot" aria-hidden="true"><span></span></div>
+          <div class="printer__paper">
+            <div class="receipt">
+              <div class="r-head">
+                <span class="r-word" role="img" aria-label="MercaBásica"></span>
+                <p>CIFP TONY GALLARDO<br>LAS PALMAS DE GRAN CANARIA</p>
+                <p class="r-row"><span>VIE 11/12/2026</span><span>EDICIÓN 03</span></p>
+              </div>
+              <hr class="r-rule r-rule--double">
+              <p class="r-row r-cols"><span>HORA</span><span>CONCEPTO</span></p>
+              <hr class="r-rule">
+              <ol class="r-list">
+                <li class="r-item"><time>09:30</time><span>Obertura emocional<small>Fundido a negro. Dos preguntas.</small></span></li>
+                <li class="r-item"><time>09:30</time><span>TonyBand a capela<small>Voces desde todas las plantas</small></span></li>
+                <li class="r-item"><time>09:35</time><span>Bienvenida a MercaBásica</span></li>
+                <li class="r-item"><time>09:40</time><span>Bienvenida institucional<small>Agar García Hernández, directora</small></span></li>
+                <li class="r-item"><time>09:50</time><span>Saludo de las autoridades</span></li>
+                <li class="r-item"><time>10:10</time><span>¿Qué es MercaBásica?<small>Sabina Santana, coordinadora</small></span></li>
+                <li class="r-item"><time>10:30</time><span>Presentación oficial de Panateca</span></li>
+                <li class="r-item"><time>10:50</time><span>Presentación del recorrido<small>Vídeo interactivo</small></span></li>
+                <li class="r-item"><time>10:55</time><span>Antesala del Proyecto Identidad</span></li>
+                <li class="r-item r-item--star" data-star>
+                  <time>11:05</time><span>ENCENDIDO NAVIDEÑO ★<small>Cuenta atrás de 10 a 1</small></span>
+                  <svg class="r-circle" viewBox="0 0 300 60" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M18 34C10 14 90 6 170 6s128 8 124 26-90 26-170 24S4 46 10 30c3-9 16-15 34-18"/></svg>
+                </li>
+                <li class="r-item"><time>11:10</time><span>Recorrido por las casas</span></li>
+                <li class="r-item"><time>12:50</time><span>Regreso al espacio central<small>Cierre del acto</small></span></li>
+                <li class="r-item"><time>13:00</time><span>Actuaciones de clausura<small>Baile de Navidad · Acondicionamiento Físico 1.º y 2.º</small><small>2.º de Educación Infantil</small></span></li>
+                <li class="r-item"><time>13:20</time><span>Despedida y foto de familia</span></li>
+              </ol>
+              <hr class="r-rule">
+              <p class="r-row"><span>ARTÍCULOS</span><span>14</span></p>
+              <p class="r-row"><span>ENTRADA</span><span>ABIERTA A LA COMUNIDAD</span></p>
+              <p class="r-row"><span>ILUSIÓN</span><span>INCLUIDA</span></p>
+              <hr class="r-rule r-rule--double">
+              <p class="r-row r-total"><span>TOTAL</span><span>UNA MAÑANA</span></p>
+              <p class="r-thanks">¡Gracias por su visita!<br><span>Vuelva pronto</span></p>
+              <svg class="r-barcode" data-barcode="MB26-1112-0930" preserveAspectRatio="none" aria-hidden="true"></svg>
+              <p class="r-code">MB26 · 1112 · 0930</p>
+            </div>
+          </div>
+          <p class="hand-note program__note" data-receipt-note aria-hidden="true"><svg viewBox="0 0 80 40"><path d="M76 8C52 2 22 6 8 28m0 0l2-12m-2 12l11-4"/></svg>aquí se enciende todo</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 03 · RECORRIDO ============ -->
+    <section class="route" id="recorrido" data-route>
+      <div class="route__pin">
+        <div class="route__track" data-track>
+          <div class="route__intro">
+            <header class="sec-head"><span class="sec-num">03</span><span>El recorrido</span><span class="sec-rule"></span><span class="sec-aside">11:10 – 12:50 h</span></header>
+            <h2 class="route__title">Seis casas, <em>seis preguntas.</em></h2>
+            <p>MercaBásica no se entiende desde un único lugar. Hay que recorrerla, descubrirla y, sobre todo, vivirla. Cada casa cuenta una parte de nuestra historia.</p>
+            <p class="hand-note route__hint" aria-hidden="true">sigue bajando y pasea por la calle →</p>
+          </div>
+
+          <article class="casa" style="--c:#0B74C4;--tint:#E7F0F9">
+            <div class="awning casa__awning" data-awning data-a="#0B74C4" data-b="#FFFDF6" data-seg="34" data-seed="3"></div>
+            <span class="casa__sign">Aprender</span>
+            <div class="casa__body">
+              <svg class="casa__doodle" viewBox="0 0 120 120" aria-hidden="true"><path pathLength="1" d="M30 18h48v74l-6-6-6 6-6-6-6 6-6-6-6 6-6-6-6 6z"/><path pathLength="1" d="M38 32h32M38 44h24M38 56h32M38 68h18"/><path pathLength="1" d="M70 102l34-34 8 8-34 34-10 2zM100 72l8 8"/></svg>
+              <p class="casa__num">Casa 01</p>
+              <h3 class="casa__q">¿Cómo aprendemos?</h3>
+              <p>Haciendo. El aula se muda al pasillo: el alumnado monta su estand, diseña el escaparate, negocia, cobra y atiende. Aprender deja de ser un ensayo.</p>
+              <ul class="casa__chips"><li>Proyectos</li><li>Escaparatismo</li><li>Atención al cliente</li><li>Tiques de venta</li></ul>
+            </div>
+          </article>
+
+          <article class="casa" style="--c:#CC544C;--tint:#FBE9E5">
+            <div class="awning casa__awning" data-awning data-a="#CC544C" data-b="#FFFDF6" data-seg="34" data-seed="5"></div>
+            <span class="casa__sign">Crear</span>
+            <div class="casa__body">
+              <svg class="casa__doodle" viewBox="0 0 120 120" aria-hidden="true"><path pathLength="1" d="M60 10v16"/><path pathLength="1" d="M60 28l8.8 23.9 25.4 1-19.9 15.7 6.9 24.5L60 79 38.8 93.1l6.9-24.5-19.9-15.7 25.4-1z"/><path pathLength="1" d="M48 62q12-5 24 0M50 71q10 4 20 0"/></svg>
+              <p class="casa__num">Casa 02</p>
+              <h3 class="casa__q">¿Qué somos capaces de crear?</h3>
+              <p>Madera, masa, papel y purpurina. Todo lo que hay en los puestos ha salido de las manos del alumnado, de la primera idea al último lazo.</p>
+              <ul class="casa__chips"><li>Carpintería</li><li>Adornos navideños</li><li>Decoración</li><li>Repostería</li><li>Artesanía</li></ul>
+            </div>
+          </article>
+
+          <article class="casa" style="--c:#2F6A4F;--tint:#E5F0E6">
+            <div class="awning casa__awning" data-awning data-a="#2F6A4F" data-b="#FFFDF6" data-seg="34" data-seed="8"></div>
+            <span class="casa__sign">Cuidar</span>
+            <div class="casa__body">
+              <svg class="casa__doodle" viewBox="0 0 120 120" aria-hidden="true"><path pathLength="1" d="M60 50c-8-14-28-8-20 8 6 10 20 18 20 18s14-8 20-18c8-16-12-22-20-8z"/><path pathLength="1" d="M16 72c8-2 18 6 26 12s28 8 36 2 16-14 26-12"/><path pathLength="1" d="M16 72c-4 8 0 18 12 24l20 8M104 72c4 8 0 18-12 24l-20 8"/></svg>
+              <p class="casa__num">Casa 03</p>
+              <h3 class="casa__q">¿Cómo cuidamos?</h3>
+              <p>Cuidar también se aprende: a las personas que nos visitan, a los más pequeños y a que todo salga bien durante la mañana.</p>
+              <ul class="casa__chips"><li>Cuidados personales</li><li>Higiene</li><li>Talleres infantiles</li><li>Seguridad y organización</li></ul>
+            </div>
+          </article>
+
+          <article class="casa" style="--c:#C94B6D;--tint:#FBE8EC">
+            <div class="awning casa__awning" data-awning data-a="#C94B6D" data-b="#FFFDF6" data-seg="34" data-seed="13"></div>
+            <span class="casa__sign">Incluir</span>
+            <div class="casa__body">
+              <svg class="casa__doodle" viewBox="0 0 120 120" aria-hidden="true"><path pathLength="1" d="M26 62h68M30 62c0 22 14 32 30 32s30-10 30-32M42 104h36"/><path pathLength="1" d="M50 50c-6-8 6-14 0-24M62 48c-6-8 6-14 0-26M74 50c-6-8 6-14 0-22"/></svg>
+              <p class="casa__num">Casa 04</p>
+              <h3 class="casa__q">¿Cómo incluimos?</h3>
+              <p>Cada persona tiene algo valioso que aportar. Aquí se demuestra con hechos, codo con codo, entre familias profesionales y centros educativos.</p>
+              <ul class="casa__chips"><li>Panateca</li><li>Empleo con apoyo</li><li>Aprendizaje-Servicio</li><li>Integración Social</li></ul>
+            </div>
+          </article>
+
+          <article class="casa" style="--c:#C98A1E;--tint:#FBF0D9">
+            <div class="awning casa__awning" data-awning data-a="#D99A2B" data-b="#FFFDF6" data-seg="34" data-seed="21"></div>
+            <span class="casa__sign">Transformar</span>
+            <div class="casa__body">
+              <svg class="casa__doodle" viewBox="0 0 120 120" aria-hidden="true"><path pathLength="1" d="M22.4 46.3A40 40 0 1 1 29.4 85.7"/><path pathLength="1" d="M40.4 89.5l-11-3.8 1.8 11.5"/><path pathLength="1" d="M60 80c-18-6-16-30 10-40 6 20 4 34-10 40zm0 0c2-14 4-26 10-40"/></svg>
+              <p class="casa__num">Casa 05</p>
+              <h3 class="casa__q">¿Cómo transformamos?</h3>
+              <p>Comprar también es decidir. Producto de proximidad, consumo responsable y un mercado que mira hacia fuera, hacia el barrio y la isla.</p>
+              <ul class="casa__chips"><li>Kilómetro cero</li><li>Consumo responsable</li><li>Comercio local</li><li>Compromiso social</li></ul>
+            </div>
+          </article>
+
+          <article class="casa" style="--c:#0A2150;--tint:#FBF0C9">
+            <div class="awning casa__awning" data-awning data-a="#0A2150" data-b="#FCECB4" data-seg="34" data-seed="34"></div>
+            <span class="casa__sign">Celebrar</span>
+            <div class="casa__body">
+              <svg class="casa__doodle" viewBox="0 0 120 120" aria-hidden="true"><path pathLength="1" d="M10 30q50 40 100 0"/><path pathLength="1" d="M27 43h6v5h-6zM30 48c-6 4-6 14 0 16 6-2 6-12 0-16zM57 50h6v5h-6zM60 55c-6 4-6 14 0 16 6-2 6-12 0-16zM87 43h6v5h-6zM90 48c-6 4-6 14 0 16 6-2 6-12 0-16z"/><path pathLength="1" d="M28 92l6 6m0-6l-6 6M84 88l8 8m0-8l-8 8M58 98v8m-4-4h8"/></svg>
+              <p class="casa__num">Casa 06</p>
+              <h3 class="casa__q">¿Cómo celebramos juntos?</h3>
+              <p>Con música que baja por las escaleras, con luces que se encienden a la vez y con un baile final. Porque también se aprende celebrando.</p>
+              <ul class="casa__chips"><li>TonyBand</li><li>Encendido navideño</li><li>Baile de Navidad</li><li>Actuaciones</li></ul>
+            </div>
+          </article>
+
+          <div class="route__end">
+            <p>Y juntas nos recuerdan algo fundamental:</p>
+            <p class="route__end-big">la Formación Profesional se construye cuando las personas, los conocimientos y las profesiones <em>se encuentran.</em></p>
+          </div>
+        </div>
+        <div class="route__progress" aria-hidden="true"><span data-route-bar></span></div>
+      </div>
+    </section>
+
+    <!-- ============ 04 · PANATECA ============ -->
+    <section class="pana" id="panateca">
+      <div class="pana__stripes" aria-hidden="true"></div>
+      <div class="wrap pana__grid">
+        <div class="pana__frame" data-reveal>
+          <svg class="pana__oval" viewBox="0 0 400 500" aria-hidden="true" data-scallop></svg>
+          <div class="pana__logo">
+            <span class="pana__steam" aria-hidden="true"><i></i><i></i><i></i></span>
+            <img src="assets/img/logo-panateca.webp" width="620" height="521" alt="Panateca, CIFP Tony Gallardo" loading="lazy">
+          </div>
+          <span class="pana__badge" aria-hidden="true">¡Novedad<br>2026!</span>
+        </div>
+
+        <div class="pana__text">
+          <header class="sec-head"><span class="sec-num">04</span><span>Panateca</span><span class="sec-rule"></span><span class="sec-aside">Presentación 10:30 h</span></header>
+          <h2 class="pana__title">Donde cada persona descubre que tiene <em>un lugar.</em></h2>
+          <p class="pana__lead">Panateca no es solo un espacio donde se aprende una profesión. Es un proyecto que une formación, autonomía y empleabilidad, y que se presenta oficialmente en esta edición.</p>
+
+          <div class="recipe" data-reveal>
+            <p class="recipe__head"><span>Receta n.º 1</span><span>Para todas las personas</span></p>
+            <h3 class="recipe__title">Ingredientes</h3>
+            <ul class="recipe__list">
+              <li><span>Alumnado del IFC+21</span><i></i><em>manos a la obra</em></li>
+              <li><span>Alumnado de Integración Social</span><i></i><em>acompañando</em></li>
+              <li><span>Aprendizaje-Servicio</span><i></i><em>la base</em></li>
+              <li><span>Empleo con apoyo</span><i></i><em>el horizonte</em></li>
+              <li><span>Colaboración entre centros</span><i></i><em>en abundancia</em></li>
+              <li><span>Empresas</span><i></i><em>con la puerta abierta</em></li>
+              <li><span>Autonomía</span><i></i><em>a fuego lento</em></li>
+            </ul>
+            <p class="recipe__how"><strong>Elaboración.</strong> Mezclar la formación con la vida real. Dejar reposar lo necesario para que cada persona encuentre su sitio, una responsabilidad y algo valioso que aportar.</p>
+          </div>
+
+          <blockquote class="pana__quote">Cuando la educación se conecta con la vida, el aprendizaje deja de ser una preparación para el futuro. <em>Se convierte en una oportunidad para transformar el presente.</em></blockquote>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 05 · ENCENDIDO ============ -->
+    <section class="lights" id="encendido" data-lights>
+      <div class="lights__garland" data-garland aria-hidden="true"></div>
+      <canvas class="lights__confetti" data-confetti aria-hidden="true"></canvas>
+      <div class="wrap lights__inner">
+        <header class="sec-head sec-head--center"><span class="sec-num">05</span><span>11:05 h · Encendido navideño</span></header>
+        <h2 class="lights__title"><span>La Navidad no llega desde fuera.</span> <em>Nace dentro.</em></h2>
+
+        <div class="lights__stage">
+          <div class="lights__ask" data-lights-ask>
+            <p>Esta mañana la música ha nacido en nuestras plantas. Ahora queremos que el centro se llene también de luz. <strong>¿Nos ayudas a encenderla?</strong></p>
+            <button class="bigbutton" type="button" data-lights-btn>
+              <svg class="bigbutton__ring" viewBox="0 0 200 200" aria-hidden="true">
+                <defs><path id="ring" d="M100 100m-88 0a88 88 0 1 1 176 0a88 88 0 1 1-176 0"/></defs>
+                <text font-family="DM Mono, monospace" font-size="11.5" letter-spacing="3.4" fill="currentColor"><textPath href="#ring">PULSA Y CUENTA CON NOSOTROS · DIEZ, NUEVE, OCHO… ·</textPath></text>
+              </svg>
+              <span class="bigbutton__cap">Encender</span>
+            </button>
+            <label class="sound"><input type="checkbox" checked data-sound> <span>Con sonido</span></label>
+          </div>
+          <div class="lights__count" data-lights-count aria-live="assertive"></div>
+          <div class="lights__done" data-lights-done hidden>
+            <p class="lights__yes">¡Ya está!</p>
+            <p class="lights__inaug">MercaBásica queda oficialmente inaugurada.</p>
+            <p class="lights__xmas">¡Feliz Navidad!</p>
+            <button class="linkbtn" type="button" data-lights-reset>Apagar y volver a encender</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 06 · CARTELES ============ -->
+    <section class="posters" id="carteles">
+      <div class="wrap">
+        <header class="sec-head"><span class="sec-num">06</span><span>Cartelería</span><span class="sec-rule"></span><span class="sec-aside">Toca para ampliar</span></header>
+        <h2 class="posters__title">Cuatro carteles, <em>un mismo mercado.</em></h2>
+        <ul class="posters__wall">
+          <li><button type="button" data-poster="assets/img/cartel-1.webp" aria-label="Ampliar cartel con acebo y lazo"><img src="assets/img/cartel-1.webp" width="820" height="1160" alt="Cartel MercaBásica 2026 con acebo, lazo rojo y logo del CIFP Tony Gallardo" loading="lazy"></button><span class="tape" aria-hidden="true"></span></li>
+          <li><button type="button" data-poster="assets/img/cartel-2.webp" aria-label="Ampliar cartel de rayas amarillas"><img src="assets/img/cartel-2.webp" width="820" height="1160" alt="Cartel MercaBásica 2026 sobre rayas amarillas" loading="lazy"></button><span class="tape" aria-hidden="true"></span></li>
+          <li><button type="button" data-poster="assets/img/cartel-5.webp" aria-label="Ampliar cartel de Panateca"><img src="assets/img/cartel-5.webp" width="820" height="1160" alt="Cartel MercaBásica 2026 con el logo de Panateca sobre rayas rojas" loading="lazy"></button><span class="tape" aria-hidden="true"></span></li>
+          <li><button type="button" data-poster="assets/img/cartel-6.webp" aria-label="Ampliar cartel ilustrado del mercado"><img src="assets/img/cartel-6.webp" width="820" height="1160" alt="Cartel MercaBásica 2026 con la ilustración de los puestos del mercado" loading="lazy"></button><span class="tape" aria-hidden="true"></span></li>
+        </ul>
+      </div>
+      <dialog class="lightbox" data-lightbox aria-label="Cartel ampliado">
+        <img src="" alt="" data-lightbox-img>
+        <button type="button" class="lightbox__close" data-lightbox-close>Cerrar</button>
+      </dialog>
+    </section>
+
+    <!-- ============ 07 · VISITA ============ -->
+    <section class="visit" id="visita">
+      <div class="wrap visit__grid">
+        <div class="visit__info">
+          <header class="sec-head"><span class="sec-num">07</span><span>Cómo llegar</span><span class="sec-rule"></span></header>
+          <h2 class="visit__title">Ven<span>.</span></h2>
+          <dl class="visit__dl">
+            <div><dt>Cuándo</dt><dd>Viernes, 11 de diciembre de 2026</dd></div>
+            <div><dt>Horario</dt><dd>Desde las 09:30 h<small>Encendido 11:05 h · Recorrido por las casas 11:10–12:50 h · Clausura 13:00 h</small></dd></div>
+            <div><dt>Dónde</dt><dd>CIFP Tony Gallardo<small>Las Palmas de Gran Canaria</small></dd></div>
+            <div><dt>Para quién</dt><dd>Para todo el mundo<small>Familias, alumnado, profesorado, centros educativos, entidades, empresas… y cualquiera con ganas de mirar.</small></dd></div>
+          </dl>
+          <div class="visit__actions">
+            <a class="btn btn--solid" href="https://www.google.com/maps/search/?api=1&amp;query=CIFP+Tony+Gallardo+Las+Palmas+de+Gran+Canaria" target="_blank" rel="noopener">Cómo llegar <span aria-hidden="true">↗</span></a>
+            <button class="btn" type="button" data-ics>Añadir al calendario</button>
+            <a class="btn btn--ghost" href="https://calendar.google.com/calendar/render?action=TEMPLATE&amp;text=MercaB%C3%A1sica%202026&amp;dates=20261211T093000Z%2F20261211T133000Z&amp;location=CIFP%20Tony%20Gallardo%2C%20Las%20Palmas%20de%20Gran%20Canaria&amp;details=Mercado%20navide%C3%B1o%20del%20CIFP%20Tony%20Gallardo%20hecho%20por%20su%20alumnado.%20Encendido%20a%20las%2011%3A05." target="_blank" rel="noopener">Google Calendar <span aria-hidden="true">↗</span></a>
+          </div>
+        </div>
+
+        <div class="machine">
+          <div class="machine__body">
+            <p class="machine__label">Coja su número</p>
+            <div class="machine__display seg" data-machine-display aria-hidden="true"></div>
+            <button class="machine__btn" type="button" data-machine-btn>Coger número</button>
+            <div class="machine__mouth" aria-hidden="true"></div>
+          </div>
+          <div class="machine__ticket" data-machine-ticket aria-live="polite">
+            <p class="mt__head">Su número</p>
+            <p class="mt__num" data-machine-num>00</p>
+            <p class="mt__info">Vie 11·12 · 09:30 h<br>CIFP Tony Gallardo</p>
+            <p class="mt__bye">Le esperamos</p>
+          </div>
+          <p class="hand-note machine__note" aria-hidden="true">sin colas…<br>bueno, alguna habrá</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ GRACIAS ============ -->
+    <section class="thanks" id="gracias">
+      <div class="wrap">
+        <p class="thanks__pre">Detrás de cada producto, de cada taller, de cada actividad, de cada espacio y de cada proyecto…</p>
+        <p class="thanks__big">hay <em>personas.</em></p>
+        <ul class="thanks__list" data-reveal="people">
+          <li style="--i:0"><span>Personas que</span> <em>aprenden.</em></li>
+          <li style="--i:1"><span>Personas que</span> <em>enseñan.</em></li>
+          <li style="--i:2"><span>Personas que</span> <em>acompañan.</em></li>
+          <li style="--i:3"><span>Personas que</span> <em>creen.</em></li>
+        </ul>
+        <p class="thanks__last">Y personas que cada día descubren que son capaces de <em>mucho más</em> de lo que imaginaban.</p>
+        <p class="thanks__gracias">Gracias por venir · Gracias por mirar · Gracias por participar</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <div class="wrap">
+      <p class="foot__bye">¡Feliz Navidad y hasta la próxima edición!</p>
+      <div class="foot__logos">
+        <img src="assets/img/logo-cifp.webp" width="520" height="510" alt="CIFP Tony Gallardo" loading="lazy" class="foot__cifp">
+        <img src="assets/img/logo-panateca.webp" width="620" height="521" alt="Panateca" loading="lazy" class="foot__pana">
+        <img src="assets/img/logo-gobcan.webp" width="325" height="178" alt="Gobierno de Canarias" loading="lazy" class="foot__gob">
+      </div>
+      <p class="foot__small">MercaBásica es un proyecto de la comunidad educativa del CIFP Tony Gallardo, en Las Palmas de Gran Canaria. Gracias al alumnado, al profesorado y al personal del centro, a las familias, entidades, centros educativos, empresas y colaboradores que lo hacen posible.</p>
+      <div class="foot__bar">
+        <span>MercaBásica 2026 · Tercera edición</span>
+        <a href="#inicio">Volver arriba ↑</a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
