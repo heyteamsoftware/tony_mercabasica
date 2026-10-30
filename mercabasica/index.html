@@ -54,21 +54,9 @@
       <a href="#programa">Programa</a>
       <a href="#recorrido">Recorrido</a>
       <a href="#panateca">Panateca</a>
-      <a href="#encendido">Encendido</a>
       <a href="#visita">Cómo llegar</a>
     </nav>
-    <a class="beam__lights" href="#encendido" aria-label="Ir al encendido navideño">
-      <svg viewBox="0 0 96 26" aria-hidden="true">
-        <path d="M2 4Q48 22 94 4" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".55"/>
-        <g class="mini"><rect x="10.6" y="6.5" width="2.8" height="2.6" rx=".6"/><ellipse class="mini__b" style="--c:#FFD27A" cx="12" cy="12.6" rx="2.6" ry="3.6"/></g>
-        <g class="mini"><rect x="25.6" y="10.1" width="2.8" height="2.6" rx=".6"/><ellipse class="mini__b" style="--c:#FF6B5B" cx="27" cy="16.2" rx="2.6" ry="3.6"/></g>
-        <g class="mini"><rect x="40.6" y="11.8" width="2.8" height="2.6" rx=".6"/><ellipse class="mini__b" style="--c:#7FD3A0" cx="42" cy="17.9" rx="2.6" ry="3.6"/></g>
-        <g class="mini"><rect x="54.6" y="11.7" width="2.8" height="2.6" rx=".6"/><ellipse class="mini__b" style="--c:#6FB6FF" cx="56" cy="17.8" rx="2.6" ry="3.6"/></g>
-        <g class="mini"><rect x="69.6" y="9.7" width="2.8" height="2.6" rx=".6"/><ellipse class="mini__b" style="--c:#FF9EC0" cx="71" cy="15.8" rx="2.6" ry="3.6"/></g>
-        <g class="mini"><rect x="84.6" y="5.9" width="2.8" height="2.6" rx=".6"/><ellipse class="mini__b" style="--c:#FFE9A8" cx="86" cy="12" rx="2.6" ry="3.6"/></g>
-      </svg>
-      <span class="beam__date">11·12·26</span>
-    </a>
+    <a class="beam__lights" href="#visita" aria-label="Fecha y cómo llegar"><span class="beam__date">11·12·26</span></a>
     <button class="beam__menu" type="button" aria-expanded="false" aria-controls="menu" data-menu-btn>
       <span class="beam__menu-label">Menú</span><span class="beam__burger" aria-hidden="true"></span>
     </button>
@@ -79,9 +67,8 @@
     <a href="#programa"><small>02</small>Programa</a>
     <a href="#recorrido"><small>03</small>Recorrido</a>
     <a href="#panateca"><small>04</small>Panateca</a>
-    <a href="#encendido"><small>05</small>Encendido</a>
-    <a href="#carteles"><small>06</small>Carteles</a>
-    <a href="#visita"><small>07</small>Cómo llegar</a>
+    <a href="#carteles"><small>05</small>Carteles</a>
+    <a href="#visita"><small>06</small>Cómo llegar</a>
     <p class="menu__foot">Viernes 11 de diciembre · CIFP Tony Gallardo</p>
   </nav>
 
@@ -97,90 +84,47 @@
         <span>CIFP Tony Gallardo · Las Palmas de G.C.</span>
       </div>
 
-      <h1 class="hero__title">
-        <img class="hero__word" src="assets/img/wordmark.webp" width="1209" height="382" alt="MercaBásica" fetchpriority="high">
-        <span class="hero__sub">
-          <img class="hero__year" src="assets/img/year.webp" width="460" height="177" alt="2026">
-          <span class="hero__date">
-            <svg class="hero__marker" viewBox="0 0 400 100" preserveAspectRatio="none" aria-hidden="true"><path d="M6 26C40 18 90 22 140 17s120-3 190-5 58-2 66 2l-4 20 6 18-4 26c-64 6-144 2-224 8S50 88 8 90l4-20-8-20z" fill="#FBE36F"/></svg>
-            <img src="assets/img/date.webp" width="716" height="145" alt="11 de diciembre">
-          </span>
-        </span>
-      </h1>
+      <div class="hero__main">
+        <div class="hero__left">
+          <h1 class="hero__title">
+            <img class="hero__word" src="assets/img/wordmark.webp" width="1209" height="382" alt="MercaBásica" fetchpriority="high">
+            <span class="hero__sub">
+              <img class="hero__year" src="assets/img/year.webp" width="460" height="177" alt="2026">
+              <span class="hero__date">
+                <svg class="hero__marker" viewBox="0 0 400 100" preserveAspectRatio="none" aria-hidden="true"><path d="M6 26C40 18 90 22 140 17s120-3 190-5 58-2 66 2l-4 20 6 18-4 26c-64 6-144 2-224 8S50 88 8 90l4-20-8-20z" fill="#FBE36F"/></svg>
+                <img src="assets/img/date.webp" width="716" height="145" alt="11 de diciembre">
+              </span>
+            </span>
+          </h1>
 
-      <div class="hero__foot">
-        <p class="hero__lead">Durante una mañana, el CIFP Tony Gallardo se convierte en un mercado navideño: el alumnado diseña, elabora, vende, cuida y celebra. <em>Tú solo tienes que venir.</em></p>
-
-        <div class="counter" data-countdown>
-          <span class="counter__label" data-countdown-label>Faltan</span>
-          <div class="counter__display" role="timer" aria-live="off" data-countdown-aria>
-            <div class="counter__unit"><span class="seg" data-unit="d"></span><small>días</small></div>
-            <i class="counter__colon" aria-hidden="true"></i>
-            <div class="counter__unit"><span class="seg" data-unit="h"></span><small>horas</small></div>
-            <i class="counter__colon" aria-hidden="true"></i>
-            <div class="counter__unit"><span class="seg" data-unit="m"></span><small>min</small></div>
-            <i class="counter__colon" aria-hidden="true"></i>
-            <div class="counter__unit"><span class="seg" data-unit="s"></span><small>seg</small></div>
-          </div>
-        </div>
-
-        <div class="tag">
-          <div class="tag__swing">
-            <span class="tag__string" aria-hidden="true"></span>
-            <div class="tag__card">
-              <span class="tag__hand">Abierto a la comunidad</span>
-              <strong>Vie<br>11·12</strong>
-              <span class="tag__mono">desde las 09:30 h</span>
+          <div class="hero__foot">
+            <p class="hero__lead">Durante una mañana, el CIFP Tony Gallardo se convierte en un mercado navideño: el alumnado diseña, elabora, vende, cuida y celebra. <em>Tú solo tienes que venir.</em></p>
+            <div class="calendar" data-countdown>
+              <p class="calendar__top" data-countdown-label>Faltan</p>
+              <p class="calendar__num" data-days>··</p>
+              <p class="calendar__unit" data-days-unit>días</p>
+              <p class="calendar__for">para el 11 de diciembre</p>
             </div>
           </div>
         </div>
+
+      <div class="machine machine--hero">
+        <div class="machine__body">
+          <p class="machine__label">Coja su número</p>
+          <div class="machine__display seg" data-machine-display aria-hidden="true"></div>
+          <button class="machine__btn" type="button" data-machine-btn>Coger número</button>
+          <div class="machine__mouth" aria-hidden="true"></div>
+        </div>
+        <div class="machine__ticket" data-machine-ticket aria-live="polite">
+          <p class="mt__head">Su número</p>
+          <p class="mt__num" data-machine-num>00</p>
+          <p class="mt__info">Vie 11·12 · 09:30 h<br>CIFP Tony Gallardo</p>
+          <p class="mt__bye">Le esperamos</p>
+        </div>
+        <p class="hand-note machine__note" aria-hidden="true">sin colas…<br>bueno, alguna habrá</p>
+      </div>
       </div>
 
-      <a class="hero__cue" href="#obertura"><span>Fundido a negro</span><i aria-hidden="true"></i></a>
-    </section>
-
-    <!-- ============ OBERTURA ============ -->
-    <section class="overture" id="obertura" aria-label="Obertura">
-      <div class="overture__stage" data-overture data-step="0">
-        <p class="overture__time">09:30 h — Obertura emocional</p>
-        <ol class="overture__dots" aria-hidden="true"><li></li><li></li><li></li><li></li><li></li></ol>
-
-        <div class="overture__layer is-active" data-step="0">
-          <p class="ov-silence">Silencio. <span>Pantalla en negro.</span></p>
-        </div>
-        <div class="overture__layer" data-step="1">
-          <p class="ov-q" data-split>¿Y si la educación pudiera <em>cambiar una vida</em>?</p>
-        </div>
-        <div class="overture__layer" data-step="2">
-          <p class="ov-q ov-q--long" data-split>¿Y si una oportunidad pudiera cambiar la forma en que alguien <em>se ve a sí mismo</em>?</p>
-        </div>
-        <div class="overture__layer" data-step="3">
-          <div class="sheet" data-sheet>
-            <p class="sheet__edge"><span>MB 400 — Hoja de contactos</span><span>Ediciones anteriores</span></p>
-            <ul class="sheet__grid">
-              <li><p>Una mano trabajando la madera</p><span class="sheet__n">07A</span></li>
-              <li><p>Una masa de pan</p><span class="sheet__n">08</span></li>
-              <li><p>Una persona atendiendo</p><span class="sheet__n">08A</span></li>
-              <li class="sheet__pick">
-                <p>Una sonrisa</p><span class="sheet__n">09</span>
-                <svg class="sheet__loop" viewBox="0 0 120 100" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M20 54C14 24 56 8 92 16c26 7 28 50 2 66C64 98 18 90 10 62 6 44 26 26 48 22"/></svg>
-                <span class="sheet__note" aria-hidden="true">esta</span>
-              </li>
-              <li><p>Una mirada</p><span class="sheet__n">09A</span></li>
-              <li><p>Una pieza que se construye</p><span class="sheet__n">10</span></li>
-              <li><p>Una persona ayudando a otra</p><span class="sheet__n">10A</span></li>
-              <li><p>Un grupo trabajando</p><span class="sheet__n">11</span></li>
-              <li><p>Una actividad compartida</p><span class="sheet__n">11A</span></li>
-            </ul>
-          </div>
-        </div>
-        <div class="overture__layer" data-step="4">
-          <p class="ov-s" data-split>Entonces, la educación deja de ser solo educación.</p>
-        </div>
-        <div class="overture__layer" data-step="5">
-          <p class="ov-f">Se convierte en <span class="ov-glow">futuro.</span></p>
-        </div>
-      </div>
     </section>
 
     <!-- ============ 01 · QUÉ ES ============ -->
@@ -314,7 +258,6 @@
         <div class="program__intro">
           <header class="sec-head"><span class="sec-num">02</span><span>Programa</span><span class="sec-rule"></span></header>
           <h2 class="program__title">El tique <em>del día</em></h2>
-          <p class="program__lead">Viernes 11 de diciembre. De la primera voz de la TonyBand a la última foto de familia: esto es todo lo que entra en tu mañana.</p>
           <p class="program__small">Horario orientativo, según la escaleta del acto.</p>
         </div>
 
@@ -495,41 +438,10 @@
       </div>
     </section>
 
-    <!-- ============ 05 · ENCENDIDO ============ -->
-    <section class="lights" id="encendido" data-lights>
-      <div class="lights__garland" data-garland aria-hidden="true"></div>
-      <canvas class="lights__confetti" data-confetti aria-hidden="true"></canvas>
-      <div class="wrap lights__inner">
-        <header class="sec-head sec-head--center"><span class="sec-num">05</span><span>11:05 h · Encendido navideño</span></header>
-        <h2 class="lights__title"><span>La Navidad no llega desde fuera.</span> <em>Nace dentro.</em></h2>
-
-        <div class="lights__stage">
-          <div class="lights__ask" data-lights-ask>
-            <p>Esta mañana la música ha nacido en nuestras plantas. Ahora queremos que el centro se llene también de luz. <strong>¿Nos ayudas a encenderla?</strong></p>
-            <button class="bigbutton" type="button" data-lights-btn>
-              <svg class="bigbutton__ring" viewBox="0 0 200 200" aria-hidden="true">
-                <defs><path id="ring" d="M100 100m-88 0a88 88 0 1 1 176 0a88 88 0 1 1-176 0"/></defs>
-                <text font-family="DM Mono, monospace" font-size="11.5" letter-spacing="3.4" fill="currentColor"><textPath href="#ring">PULSA Y CUENTA CON NOSOTROS · DIEZ, NUEVE, OCHO… ·</textPath></text>
-              </svg>
-              <span class="bigbutton__cap">Encender</span>
-            </button>
-            <label class="sound"><input type="checkbox" checked data-sound> <span>Con sonido</span></label>
-          </div>
-          <div class="lights__count" data-lights-count aria-live="assertive"></div>
-          <div class="lights__done" data-lights-done hidden>
-            <p class="lights__yes">¡Ya está!</p>
-            <p class="lights__inaug">MercaBásica queda oficialmente inaugurada.</p>
-            <p class="lights__xmas">¡Feliz Navidad!</p>
-            <button class="linkbtn" type="button" data-lights-reset>Apagar y volver a encender</button>
-          </div>
-        </div>
-      </div>
-    </section>
-
     <!-- ============ 06 · CARTELES ============ -->
     <section class="posters" id="carteles">
       <div class="wrap">
-        <header class="sec-head"><span class="sec-num">06</span><span>Cartelería</span><span class="sec-rule"></span><span class="sec-aside">Toca para ampliar</span></header>
+        <header class="sec-head"><span class="sec-num">05</span><span>Cartelería</span><span class="sec-rule"></span><span class="sec-aside">Toca para ampliar</span></header>
         <h2 class="posters__title">Cuatro carteles, <em>un mismo mercado.</em></h2>
         <ul class="posters__wall">
           <li><button type="button" data-poster="assets/img/cartel-1.webp" aria-label="Ampliar cartel con acebo y lazo"><img src="assets/img/cartel-1.webp" width="820" height="1160" alt="Cartel MercaBásica 2026 con acebo, lazo rojo y logo del CIFP Tony Gallardo" loading="lazy"></button><span class="tape" aria-hidden="true"></span></li>
@@ -547,9 +459,11 @@
     <!-- ============ 07 · VISITA ============ -->
     <section class="visit" id="visita">
       <div class="wrap visit__grid">
-        <div class="visit__info">
-          <header class="sec-head"><span class="sec-num">07</span><span>Cómo llegar</span><span class="sec-rule"></span></header>
+        <div class="visit__head">
+          <header class="sec-head"><span class="sec-num">06</span><span>Cómo llegar</span><span class="sec-rule"></span></header>
           <h2 class="visit__title">Ven<span>.</span></h2>
+        </div>
+        <div class="visit__info">
           <dl class="visit__dl">
             <div><dt>Cuándo</dt><dd>Viernes, 11 de diciembre de 2026</dd></div>
             <div><dt>Horario</dt><dd>Desde las 09:30 h<small>Encendido 11:05 h · Recorrido por las casas 11:10–12:50 h · Clausura 13:00 h</small></dd></div>
@@ -563,21 +477,6 @@
           </div>
         </div>
 
-        <div class="machine">
-          <div class="machine__body">
-            <p class="machine__label">Coja su número</p>
-            <div class="machine__display seg" data-machine-display aria-hidden="true"></div>
-            <button class="machine__btn" type="button" data-machine-btn>Coger número</button>
-            <div class="machine__mouth" aria-hidden="true"></div>
-          </div>
-          <div class="machine__ticket" data-machine-ticket aria-live="polite">
-            <p class="mt__head">Su número</p>
-            <p class="mt__num" data-machine-num>00</p>
-            <p class="mt__info">Vie 11·12 · 09:30 h<br>CIFP Tony Gallardo</p>
-            <p class="mt__bye">Le esperamos</p>
-          </div>
-          <p class="hand-note machine__note" aria-hidden="true">sin colas…<br>bueno, alguna habrá</p>
-        </div>
       </div>
     </section>
 

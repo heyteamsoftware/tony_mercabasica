@@ -115,7 +115,6 @@
   const drawers = [
     ['[data-awning]', drawAwning],
     ['[data-bunting]', drawBunting],
-    ['[data-garland]', drawGarland],
   ];
   const ro = 'ResizeObserver' in window ? new ResizeObserver((entries) => {
     entries.forEach((e) => {
@@ -169,29 +168,17 @@
   const END = Date.UTC(2026, 11, 11, 13, 30);
   const cd = $('[data-countdown]');
   if (cd) {
-    const units = { d: $('[data-unit="d"]', cd), h: $('[data-unit="h"]', cd), m: $('[data-unit="m"]', cd), s: $('[data-unit="s"]', cd) };
-    const label = $('[data-countdown-label]', cd);
-    const aria = $('[data-countdown-aria]', cd);
-    let lastMin = -1;
-    const tick = () => {
+    const num = $('[data-days]', cd), unit = $('[data-days-unit]', cd), label = $('[data-countdown-label]', cd);
+    const paint = () => {
       const now = Date.now();
-      let diff = Math.max(0, START - now);
-      const dd = Math.floor(diff / 864e5); diff -= dd * 864e5;
-      const hh = Math.floor(diff / 36e5); diff -= hh * 36e5;
-      const mm = Math.floor(diff / 6e4); diff -= mm * 6e4;
-      const ss = Math.floor(diff / 1e3);
-      setSeg(units.d, dd > 99 ? String(dd) : pad(dd));
-      setSeg(units.h, pad(hh));
-      setSeg(units.m, pad(mm));
-      setSeg(units.s, pad(ss));
-      if (now >= START) label.textContent = now < END ? '¡Es hoy! Ya estamos abiertos' : 'Gracias por venir · hasta la próxima';
-      if (mm !== lastMin) {
-        lastMin = mm;
-        aria.setAttribute('aria-label', now >= START ? label.textContent : `Faltan ${dd} días, ${hh} horas y ${mm} minutos`);
-      }
+      // días de calendario que faltan (en hora canaria, UTC+0)
+      const days = Math.round((Date.UTC(2026, 11, 11) - Date.UTC(new Date(now).getUTCFullYear(), new Date(now).getUTCMonth(), new Date(now).getUTCDate())) / 864e5);
+      if (now >= END) { label.textContent = 'Gracias'; num.textContent = '♥'; unit.textContent = 'hasta la próxima'; }
+      else if (days <= 0) { label.textContent = '¡Es hoy!'; num.textContent = '11'; unit.textContent = 'de diciembre'; }
+      else { label.textContent = 'Faltan'; num.textContent = days; unit.textContent = days === 1 ? 'día' : 'días'; }
     };
-    tick();
-    setInterval(tick, 1000);
+    paint();
+    setInterval(paint, 60000);
   }
 
   /* ------------------------------------------------------------------
@@ -205,69 +192,6 @@
     });
   }, { threshold: 0.18, rootMargin: '0px 0px -6% 0px' });
   $$('[data-reveal], .casa').forEach((el) => io.observe(el));
-
-  /* ------------------------------------------------------------------
-     Obertura: el texto aparece palabra a palabra, guiado por el scroll
-     ------------------------------------------------------------------ */
-  function splitWords(el) {
-    let i = 0;
-    const walk = (node) => {
-      [...node.childNodes].forEach((ch) => {
-        if (ch.nodeType === 3) {
-          const frag = d.createDocumentFragment();
-          ch.textContent.split(/(\s+)/).forEach((part) => {
-            if (!part) return;
-            if (/^\s+$/.test(part)) { frag.append(part); return; }
-            const s = d.createElement('span');
-            s.className = 'w';
-            s.style.setProperty('--w', i++);
-            s.textContent = part;
-            frag.append(s);
-          });
-          ch.replaceWith(frag);
-        } else if (ch.nodeType === 1) walk(ch);
-      });
-    };
-    walk(el);
-  }
-  $$('[data-split]').forEach(splitWords);
-
-  const stage = $('[data-overture]');
-  const overture = stage && stage.parentElement;
-  const layers = stage ? $$('.overture__layer', stage) : [];
-  const dots = stage ? $$('.overture__dots li', stage) : [];
-  const frames = stage ? $$('.sheet__grid li', stage) : [];
-  const sheet = $('[data-sheet]');
-  const STEPS = [0.05, 0.2, 0.36, 0.68, 0.84];
-  let curStep = -1;
-  function updateOverture() {
-    if (!overture || reduced()) return;
-    const r = overture.getBoundingClientRect();
-    if (r.bottom < 0 || r.top > innerHeight) return;
-    const total = overture.offsetHeight - innerHeight;
-    const p = clamp(-r.top / total, 0, 1);
-    let step = 0;
-    STEPS.forEach((t, i) => { if (p >= t) step = i + 1; });
-    if (step !== curStep) {
-      curStep = step;
-      stage.dataset.step = step;
-      layers.forEach((l) => {
-        const s = +l.dataset.step;
-        l.classList.toggle('is-active', s === step);
-        l.classList.toggle('is-past', s < step);
-      });
-      dots.forEach((dot, i) => dot.classList.toggle('is-on', i < step));
-    }
-    const fp = clamp((p - 0.38) / (0.62 - 0.38), 0, 1);
-    const dev = Math.floor(fp * (frames.length + 0.999));
-    frames.forEach((f, i) => f.classList.toggle('is-dev', i < dev));
-    if (sheet) sheet.classList.toggle('is-circled', fp >= 1);
-  }
-  if (reduced()) {
-    frames.forEach((f) => f.classList.add('is-dev'));
-    if (sheet) sheet.classList.add('is-circled');
-    layers.forEach((l) => l.classList.add('is-active'));
-  }
 
   /* ------------------------------------------------------------------
      Recorrido: calle horizontal anclada en escritorio
@@ -341,146 +265,6 @@
       if (e.isIntersecting) { printer.classList.add('is-printed'); pio.disconnect(); }
     }, { threshold: 0.12 });
     pio.observe(printer);
-  }
-
-  /* ------------------------------------------------------------------
-     Encendido navideño: cuenta atrás, luces, confeti y campanillas
-     ------------------------------------------------------------------ */
-  const L = $('[data-lights]');
-  if (L) {
-    const btn = $('[data-lights-btn]', L);
-    const ask = $('[data-lights-ask]', L);
-    const count = $('[data-lights-count]', L);
-    const done = $('[data-lights-done]', L);
-    const reset = $('[data-lights-reset]', L);
-    const sound = $('[data-sound]', L);
-    const canvas = $('[data-confetti]', L);
-    let running = false, timer = 0, ac = null;
-
-    const audio = () => {
-      if (!sound.checked) return null;
-      const AC = window.AudioContext || window.webkitAudioContext;
-      if (!AC) return null;
-      if (!ac) ac = new AC();
-      if (ac.state === 'suspended') ac.resume();
-      return ac;
-    };
-    const tone = (c, freq, t0, dur, vol, type = 'sine') => {
-      const o = c.createOscillator(), g = c.createGain();
-      o.type = type; o.frequency.value = freq;
-      g.gain.setValueAtTime(0.0001, t0);
-      g.gain.exponentialRampToValueAtTime(vol, t0 + 0.012);
-      g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
-      o.connect(g).connect(c.destination);
-      o.start(t0); o.stop(t0 + dur + 0.05);
-    };
-    const tickSound = (n) => { const c = audio(); if (c) tone(c, n === 1 ? 784 : 523.25, c.currentTime, 0.12, 0.05, 'triangle'); };
-    const chime = () => {
-      const c = audio(); if (!c) return;
-      [1046.5, 1318.5, 1568, 2093, 2637].forEach((f, i) => {
-        const t = c.currentTime + i * 0.085;
-        tone(c, f, t, 1.8, 0.06);
-        tone(c, f * 2.01, t, 0.9, 0.015);
-      });
-    };
-
-    const confetti = () => {
-      if (reduced() || !canvas.getContext) return;
-      const ctx = canvas.getContext('2d');
-      const dpr = Math.min(2, window.devicePixelRatio || 1);
-      const W = L.clientWidth, H = L.clientHeight;
-      canvas.width = W * dpr; canvas.height = H * dpr;
-      ctx.scale(dpr, dpr);
-      const cols = ['#FFD27A', '#FF6B5B', '#7FD3A0', '#6FB6FF', '#FF9EC0', '#FCECB4', '#FFFFFF'];
-      const ps = Array.from({ length: W < 600 ? 90 : 170 }, () => ({
-        x: W / 2 + (Math.random() - 0.5) * 120,
-        y: H * 0.42,
-        vx: (Math.random() - 0.5) * 14,
-        vy: -8 - Math.random() * 10,
-        w: 5 + Math.random() * 7,
-        h: 3 + Math.random() * 6,
-        r: Math.random() * Math.PI,
-        vr: (Math.random() - 0.5) * 0.3,
-        c: cols[(Math.random() * cols.length) | 0],
-        round: Math.random() < 0.25,
-      }));
-      const t0 = performance.now();
-      const frame = (t) => {
-        const el = t - t0;
-        ctx.clearRect(0, 0, W, H);
-        let alive = 0;
-        ps.forEach((p) => {
-          p.vy += 0.32; p.vx *= 0.985; p.vy *= 0.985;
-          p.x += p.vx; p.y += p.vy; p.r += p.vr;
-          if (p.y < H + 20) alive++;
-          ctx.save();
-          ctx.globalAlpha = clamp(1 - (el - 3200) / 900, 0, 1);
-          ctx.translate(p.x, p.y); ctx.rotate(p.r);
-          ctx.fillStyle = p.c;
-          if (p.round) { ctx.beginPath(); ctx.arc(0, 0, p.h / 1.6, 0, Math.PI * 2); ctx.fill(); }
-          else ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h * Math.abs(Math.cos(p.r * 2)) + 1);
-          ctx.restore();
-        });
-        if (alive && el < 4200) requestAnimationFrame(frame); else ctx.clearRect(0, 0, W, H);
-      };
-      requestAnimationFrame(frame);
-    };
-
-    const setOn = (animate) => {
-      L.classList.toggle('no-anim', !animate);
-      L.classList.add('is-on');
-      L.classList.remove('is-counting');
-      L.style.setProperty('--heat', 1);
-      root.classList.add('xmas-on');
-      count.innerHTML = '';
-      ask.hidden = true;
-      done.hidden = false;
-    };
-    const finish = () => {
-      clearTimeout(timer);
-      running = false;
-      btn.classList.remove('is-pressed');
-      setOn(true);
-      confetti();
-      chime();
-      store.set('mb26-luces', 'on');
-      reset.focus({ preventScroll: true });
-    };
-    const start = () => {
-      if (running) { finish(); return; }
-      running = true;
-      btn.classList.add('is-pressed');
-      audio();
-      // que la guirnalda se vea encenderse: encuadra la sección completa
-      const beamH = ($('[data-beam]') || {}).offsetHeight || 0;
-      if (Math.abs(L.getBoundingClientRect().top - beamH) > 24) {
-        scrollTo({ top: scrollY + L.getBoundingClientRect().top - beamH, behavior: reduced() ? 'auto' : 'smooth' });
-      }
-      if (reduced()) { finish(); return; }
-      L.classList.add('is-counting');
-      let n = 10;
-      const step = () => {
-        if (!running) return;
-        if (n === 0) { finish(); return; }
-        count.innerHTML = `<span>${n}</span>`;
-        L.style.setProperty('--heat', ((10 - n) / 10).toFixed(2));
-        tickSound(n);
-        n--;
-        timer = setTimeout(step, 640);
-      };
-      step();
-    };
-    btn.addEventListener('click', start);
-    reset.addEventListener('click', () => {
-      L.classList.remove('is-on', 'no-anim');
-      L.style.setProperty('--heat', 0);
-      root.classList.remove('xmas-on');
-      done.hidden = true;
-      ask.hidden = false;
-      store.del('mb26-luces');
-      btn.focus({ preventScroll: true });
-    });
-    if (store.get('mb26-luces') === 'on') setOn(false);
   }
 
   /* ------------------------------------------------------------------
@@ -558,6 +342,8 @@
         }, 480);
       } else print();
     });
+    // la máquina "da" un primer número cuando termina la animación de la portada
+    setTimeout(() => { if (!mTicket.classList.contains('is-out') && !busy) mBtn.click(); }, reduced() ? 0 : 2500);
   }
 
   /* ------------------------------------------------------------------
@@ -593,7 +379,7 @@
   const onScroll = () => {
     if (ticking) return;
     ticking = true;
-    requestAnimationFrame(() => { ticking = false; updateOverture(); updateRoute(); });
+    requestAnimationFrame(() => { ticking = false; updateRoute(); });
   };
   addEventListener('scroll', onScroll, { passive: true });
   let rt = 0;
@@ -602,7 +388,6 @@
 
   layoutRoute();
   placeNote();
-  updateOverture();
   if (d.fonts && d.fonts.ready) d.fonts.ready.then(() => { layoutRoute(); placeNote(); });
   addEventListener('load', () => { layoutRoute(); placeNote(); });
 })();
