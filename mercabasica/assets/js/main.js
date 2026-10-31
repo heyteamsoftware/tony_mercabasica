@@ -296,7 +296,7 @@
       'DTSTART:20261211T093000Z',
       'DTEND:20261211T133000Z',
       'SUMMARY:MercaBásica 2026',
-      'LOCATION:CIFP Tony Gallardo\\, Las Palmas de Gran Canaria',
+      'LOCATION:CIFP Tony Gallardo\\, Ctra. de las Coloradas\\, 35009 Las Palmas de Gran Canaria',
       'DESCRIPTION:Mercado navideño del CIFP Tony Gallardo hecho por su alumnado. Recorrido por las casas de 11:10 a 12:50. Programa: https://myappsserver.duckdns.org/mercabasica/',
       'BEGIN:VALARM', 'TRIGGER:-P1D', 'ACTION:DISPLAY', 'DESCRIPTION:Mañana es MercaBásica', 'END:VALARM',
       'END:VEVENT', 'END:VCALENDAR',
@@ -340,6 +340,26 @@
   $$('[data-consent-open]').forEach((b) => b.addEventListener('click', () => { showConsent(true); $('[data-consent-yes]', consentBox).focus(); }));
   $$('[data-track]').forEach((el) => el.addEventListener('click', () => send({ t: 'event', e: el.dataset.track, d: device() })));
   if (consent() === 'yes') pageView();
+
+  /* ------------------------------------------------------------------
+     Contador público de visitas (arriba a la derecha).
+     Suma 1 por carga como mucho cada 30 min por conexión; sin cookies.
+     Con "No rastrear" / GPC solo se lee, no se suma.
+     ------------------------------------------------------------------ */
+  const visits = $('[data-visits]');
+  if (visits) {
+    const nEl = $('[data-visits-n]', visits);
+    const paintVisits = (n) => {
+      if (!Number.isFinite(n) || n < 1) return;
+      const word = n === 1 ? 'visita' : 'visitas';
+      nEl.textContent = n.toLocaleString('es-ES');
+      $('span', visits).textContent = word;
+      visits.setAttribute('aria-label', `${n.toLocaleString('es-ES')} ${word}`);
+      visits.hidden = false;
+    };
+    fetch('api/count.php', optedOutByBrowser ? { credentials: 'omit' } : { method: 'POST', credentials: 'omit' })
+      .then((r) => r.json()).then((j) => paintVisits(+j.total)).catch(() => {});
+  }
 
   /* ------------------------------------------------------------------
      Máquina de turnos

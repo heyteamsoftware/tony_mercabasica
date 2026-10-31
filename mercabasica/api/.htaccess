@@ -1,5 +1,5 @@
-# En /api solo se puede llamar a estos dos archivos
-<FilesMatch "^(?!hit\.php$|stats\.php$).*$">
+# En /api solo se puede llamar a estos tres archivos
+<FilesMatch "^(?!hit\.php$|stats\.php$|count\.php$).*$">
   Require all denied
 </FilesMatch>
 Options -Indexes

@@ -727,3 +727,12 @@ p { text-wrap: pretty; }
 .pana__quote em, .pana__title em { color: #A3364F; }
 .recipe__head, .recipe__list em { color: #A3364F; }
 @media (min-width: 900px) { .consent { left: auto; right: 16px; } }
+
+/* Contador de visitas en la barra */
+.beam__count { display: flex; align-items: center; gap: .45rem; margin: 0 0 0 auto; padding: .32rem .7rem .3rem; border: 1px solid rgba(252, 236, 180, .35); border-radius: 999px; color: var(--cream); font-family: var(--f-mono); font-size: .66rem; letter-spacing: .12em; text-transform: uppercase; white-space: nowrap; }
+.beam__count[hidden] { display: none; }
+.beam__count svg { width: 16px; height: 11px; fill: none; stroke: var(--butter); stroke-width: 1.8; }
+.beam__count b { font-family: var(--f-serif); font-size: 1rem; font-weight: 800; letter-spacing: 0; color: var(--butter); font-variation-settings: "SOFT" 100; font-variant-numeric: tabular-nums; }
+.beam__nav + .beam__count { margin-left: 0; }
+@media (max-width: 1080px) { .beam__nav + .beam__count { margin-left: auto; } .beam__count + .beam__lights { margin-left: 0; } }
+@media (max-width: 520px) { .beam__count span { display: none; } .beam__count { padding: .3rem .55rem; } .beam__lights { display: none; } }
