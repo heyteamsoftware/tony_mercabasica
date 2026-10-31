@@ -1,0 +1,5 @@
+# Configuración local de Claude Code
+.claude/
+# Datos del contador y clave de estadísticas: viven solo en el servidor
+mercabasica/api/data/*
+!mercabasica/api/data/.htaccess

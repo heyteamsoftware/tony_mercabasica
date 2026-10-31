@@ -287,8 +287,7 @@
   /* ------------------------------------------------------------------
      Calendario (.ics)
      ------------------------------------------------------------------ */
-  const icsBtn = $('[data-ics]');
-  if (icsBtn) icsBtn.addEventListener('click', () => {
+  $$('[data-ics]').forEach((icsBtn) => icsBtn.addEventListener('click', () => {
     const ics = [
       'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//CIFP Tony Gallardo//MercaBasica 2026//ES', 'CALSCALE:GREGORIAN',
       'BEGIN:VEVENT',
@@ -298,7 +297,7 @@
       'DTEND:20261211T133000Z',
       'SUMMARY:MercaBásica 2026',
       'LOCATION:CIFP Tony Gallardo\\, Las Palmas de Gran Canaria',
-      'DESCRIPTION:Mercado navideño del CIFP Tony Gallardo hecho por su alumnado. Encendido navideño a las 11:05\\, recorrido por las casas de 11:10 a 12:50.',
+      'DESCRIPTION:Mercado navideño del CIFP Tony Gallardo hecho por su alumnado. Recorrido por las casas de 11:10 a 12:50. Programa: https://myappsserver.duckdns.org/mercabasica/',
       'BEGIN:VALARM', 'TRIGGER:-P1D', 'ACTION:DISPLAY', 'DESCRIPTION:Mañana es MercaBásica', 'END:VALARM',
       'END:VEVENT', 'END:VCALENDAR',
     ].join('\r\n');
@@ -306,7 +305,41 @@
     const a = Object.assign(d.createElement('a'), { href: url, download: 'mercabasica-2026.ics' });
     d.body.append(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 2000);
-  });
+  }));
+
+  /* ------------------------------------------------------------------
+     Consentimiento y estadística anónima (sin cookies, sin IP).
+     Solo se envía algo si la persona acepta y su navegador no pide
+     no ser rastreado (GPC / DNT).
+     ------------------------------------------------------------------ */
+  const CONSENT_KEY = 'mb26-consent';
+  const consentBox = $('[data-consent]');
+  const optedOutByBrowser = navigator.globalPrivacyControl === true || navigator.doNotTrack === '1';
+  const consent = () => store.get(CONSENT_KEY);
+  const device = () => (innerWidth < 700 ? 'm' : innerWidth < 1100 ? 't' : 'd');
+  const refHost = () => { try { const h = new URL(d.referrer).hostname; return h === location.hostname ? '' : h; } catch { return ''; } };
+  const send = (payload) => {
+    if (consent() !== 'yes' || optedOutByBrowser) return;
+    const body = JSON.stringify(payload);
+    const url = 'api/hit.php';
+    if (navigator.sendBeacon) navigator.sendBeacon(url, body);
+    else fetch(url, { method: 'POST', body, keepalive: true, credentials: 'omit' }).catch(() => {});
+  };
+  const pageView = () => send({ t: 'view', p: location.pathname.replace(/^.*\/mercabasica/, '') || '/', r: refHost(), d: device() });
+  const showConsent = (show) => { if (consentBox) consentBox.hidden = !show; };
+  const decide = (val) => {
+    store.set(CONSENT_KEY, val);
+    showConsent(false);
+    if (val === 'yes') pageView();
+  };
+  if (consentBox) {
+    $('[data-consent-yes]', consentBox).addEventListener('click', () => decide('yes'));
+    $('[data-consent-no]', consentBox).addEventListener('click', () => decide('no'));
+    if (!consent() && !optedOutByBrowser) showConsent(true);
+  }
+  $$('[data-consent-open]').forEach((b) => b.addEventListener('click', () => { showConsent(true); $('[data-consent-yes]', consentBox).focus(); }));
+  $$('[data-track]').forEach((el) => el.addEventListener('click', () => send({ t: 'event', e: el.dataset.track, d: device() })));
+  if (consent() === 'yes') pageView();
 
   /* ------------------------------------------------------------------
      Máquina de turnos

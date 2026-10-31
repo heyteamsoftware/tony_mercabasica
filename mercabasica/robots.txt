@@ -1,0 +1,6 @@
+# MercaBásica 2026 · CIFP Tony Gallardo
+User-agent: *
+Allow: /mercabasica/
+Disallow: /mercabasica/api/
+
+Sitemap: https://myappsserver.duckdns.org/mercabasica/sitemap.xml
