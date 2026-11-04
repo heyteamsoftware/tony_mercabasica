@@ -191,44 +191,406 @@
       io.unobserve(e.target);
     });
   }, { threshold: 0.18, rootMargin: '0px 0px -6% 0px' });
-  $$('[data-reveal], .casa').forEach((el) => io.observe(el));
+  $$('[data-reveal]').forEach((el) => io.observe(el));
 
   /* ------------------------------------------------------------------
-     Recorrido: calle horizontal anclada en escritorio
+     Recorrido: mapa jugable con pasaporte de sellos
      ------------------------------------------------------------------ */
-  const route = $('[data-route]');
-  const track = $('[data-track]');
-  const bar = $('[data-route-bar]');
-  let routeDist = 0, routePinned = false;
-  function layoutRoute() {
-    if (!route) return;
-    routePinned = innerWidth >= 900 && !reduced();
-    route.classList.toggle('is-pinned', routePinned);
-    if (routePinned) {
-      track.style.transform = '';
-      routeDist = Math.max(0, track.scrollWidth - innerWidth);
-      route.style.height = `${routeDist + innerHeight}px`;
-    } else {
-      route.style.height = '';
-      track.style.transform = '';
+  const rutaSec = $('[data-ruta]');
+  if (rutaSec) initRuta(rutaSec);
+
+  function initRuta(sec) {
+    const game = $('[data-ruta-game]', sec), mapEl = $('[data-ruta-map]', sec), world = $('[data-ruta-world]', sec);
+    const W = 1600, H = 1100;
+    const KEY = 'mb26-ruta', KEYX = 'mb26-ruta-x';
+
+    // Calles del plano: nodos y tramos (coordenadas del dibujo, 1600 × 1100)
+    const N = {
+      pan: [435, 285], n1: [435, 330], det: [250, 330], c1: [110, 330], rec: [110, 560], c2: [110, 960],
+      sup: [175, 960], hor: [330, 960], her: [640, 960], hall: [800, 960], j3: [1000, 960], cre: [1115, 960],
+      ima: [1385, 960], c3: [1530, 960], plz: [1530, 620], ale: [1530, 210], car: [640, 330], j2: [1000, 330],
+      son: [1000, 445], ave: [1000, 210],
+    };
+    const E = [['pan', 'n1'], ['n1', 'det'], ['det', 'c1'], ['c1', 'rec'], ['rec', 'c2'], ['c2', 'sup'], ['sup', 'hor'],
+      ['hor', 'her'], ['her', 'hall'], ['hall', 'j3'], ['j3', 'cre'], ['cre', 'ima'], ['ima', 'c3'], ['c3', 'plz'],
+      ['plz', 'ale'], ['n1', 'car'], ['car', 'her'], ['car', 'j2'], ['j2', 'son'], ['son', 'j3'], ['j2', 'ave'], ['ave', 'ale']];
+    const NODE = { hall: 'hall', herrero: 'her', horno: 'hor', superpoderes: 'sup', recuerdos: 'rec', detalles: 'det', panateca: 'pan',
+      carpintero: 'car', sonrisas: 'son', aventura: 'ave', alegria: 'ale', imaginacion: 'ima', creativo: 'cre', plaza: 'plz' };
+    const BONUS = [
+      { id: 'cambio', at: [215, 770] }, { id: 'cambio', at: [560, 470] }, { id: 'cambio', at: [1100, 770] },
+      { id: 'ventorrillo', at: [840, 300] }, { id: 'ventorrillo', at: [1145, 312] }, { id: 'ventorrillo', at: [1445, 312] },
+      { id: 'radio', at: [748, 842] }, { id: 'tonyband', at: [1345, 1040] },
+    ];
+
+    // Textos: salen de la lista del HTML
+    const stops = $$('[data-ruta-list] > li', sec).map((li) => ({
+      id: li.dataset.id, kind: li.dataset.kind, n: li.dataset.n || '', zone: li.dataset.zone,
+      name: $('h3', li).textContent.trim(), text: $('p', li).textContent.trim(), link: $('a', li), node: NODE[li.dataset.id],
+    }));
+    const bonusInfo = {};
+    $$('[data-ruta-bonus] > li', sec).forEach((li) => { bonusInfo[li.dataset.id] = { name: $('h3', li).textContent.trim(), text: $('p', li).textContent.trim() }; });
+    if (stops.length < 2 || stops.some((s) => !N[s.node])) return;
+    const TOTAL = stops.length;
+
+    /* --- Grafo y camino más corto --- */
+    const adj = {};
+    const dist2 = (a, b) => Math.hypot(N[a][0] - N[b][0], N[a][1] - N[b][1]);
+    E.forEach(([a, b]) => { (adj[a] ||= []).push(b); (adj[b] ||= []).push(a); });
+    function path(from, to) {
+      const dist = { [from]: 0 }, prev = {}, todo = new Set(Object.keys(N));
+      while (todo.size) {
+        let u = null;
+        todo.forEach((k) => { if (dist[k] !== undefined && (u === null || dist[k] < dist[u])) u = k; });
+        if (u === null || u === to) break;
+        todo.delete(u);
+        (adj[u] || []).forEach((v) => { const nd = dist[u] + dist2(u, v); if (dist[v] === undefined || nd < dist[v]) { dist[v] = nd; prev[v] = u; } });
+      }
+      const out = [to];
+      while (out[0] !== from && prev[out[0]]) out.unshift(prev[out[0]]);
+      return out.map((k) => N[k]);
     }
-    updateRoute();
-  }
-  function updateRoute() {
-    if (!route) return;
-    if (routePinned) {
-      const r = route.getBoundingClientRect();
-      if (r.bottom < -50 || r.top > innerHeight + 50) return;
-      const total = route.offsetHeight - innerHeight;
-      const p = total > 0 ? clamp(-r.top / total, 0, 1) : 0;
-      track.style.transform = `translate3d(${(-p * routeDist).toFixed(1)}px,0,0)`;
-      bar.style.setProperty('--p', p.toFixed(4));
-    } else {
-      const max = track.scrollWidth - track.clientWidth;
-      bar.style.setProperty('--p', max > 0 ? (track.scrollLeft / max).toFixed(4) : 0);
+
+    /* --- Dibujo del plano --- */
+    const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+    const lines = (arr, cx, cy, size, lh, cls) => {
+      const y0 = cy - ((arr.length - 1) * lh) / 2;
+      return arr.map((t, k) => `<text class="${cls}" x="${cx}" y="${f1(y0 + k * lh)}" font-size="${size}" text-anchor="middle" dominant-baseline="central">${esc(t)}</text>`).join('');
+    };
+    function awning(x, y, w, h, A, B, n) {
+      const s = w / n, r = s / 2, top = h - r;
+      let o = `<rect x="${x}" y="${y}" width="${w}" height="${top}" fill="${B}"/>`;
+      for (let k = 0; k < n; k += 2) o += `<rect x="${f1(x + k * s)}" y="${y}" width="${f1(s)}" height="${top}" fill="${A}"/>`;
+      for (let k = 0; k < n; k++) {
+        const x0 = x + k * s;
+        o += `<path d="M${f1(x0)} ${f1(y + top - 1)}h${f1(s)}v1a${f1(r)} ${f1(r)} 0 0 1 ${f1(-s)} 0z" fill="${k % 2 ? B : A}"${k % 2 ? ` stroke="${A}" stroke-width="2"` : ''}/>`;
+      }
+      return o + `<rect x="${x}" y="${y}" width="${w}" height="7" fill="#0A1430" opacity=".14"/>`;
     }
+    function stall(cx, top, w, h, A, B, label, opt = {}) {
+      const x = cx - w / 2, aw = h * 0.34, cnt = h * 0.3, body = top + aw;
+      let o = `<g class="rt-stall">`;
+      o += `<rect x="${x + 8}" y="${top + 10}" width="${w}" height="${h}" rx="6" fill="#0A1430" opacity=".1"/>`;
+      o += `<rect x="${x + 10}" y="${body - 4}" width="9" height="${h - aw - cnt + 8}" fill="#8A5A33"/><rect x="${x + w - 19}" y="${body - 4}" width="9" height="${h - aw - cnt + 8}" fill="#8A5A33"/>`;
+      if (label) {
+        o += `<rect x="${x + 22}" y="${body + 6}" width="${w - 44}" height="${h - aw - cnt - 14}" rx="4" fill="#FFFBF3" stroke="#0A2150" stroke-width="2"/>`;
+        o += lines(label, cx, body + (h - aw - cnt) / 2, opt.fs || 17, (opt.fs || 17) * 1.08, 'rt-lab');
+      }
+      o += `<rect x="${x - 4}" y="${top + h - cnt}" width="${w + 8}" height="12" rx="3" fill="#A86A3A"/>`;
+      o += `<rect x="${x}" y="${top + h - cnt + 10}" width="${w}" height="${cnt - 10}" fill="#D4935A"/>`;
+      for (let k = 1; k < 6; k++) o += `<rect x="${f1(x + (w * k) / 6)}" y="${top + h - cnt + 10}" width="2.5" height="${cnt - 10}" fill="#A86A3A" opacity=".55"/>`;
+      o += awning(x - 10, top, w + 20, aw, A, B, opt.n || 9);
+      return o + '</g>';
+    }
+    function box(x, y, w, h, label, fs = 22) {
+      return `<g class="rt-box"><rect x="${x + 7}" y="${y + 7}" width="${w}" height="${h}" rx="18" fill="#0A1430" opacity=".14"/>`
+        + `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="18" fill="#FFFBF3" stroke="#2B1A4F" stroke-width="4"/>`
+        + lines(label, x + w / 2, y + h / 2, fs, fs * 1.12, 'rt-lab') + '</g>';
+    }
+    const tree = (x, y, s = 1) => `<g transform="translate(${x} ${y}) scale(${s})" class="rt-tree"><ellipse cx="0" cy="62" rx="30" ry="7" fill="#0A1430" opacity=".12"/><rect x="-6" y="44" width="12" height="18" fill="#8A5A33"/><path d="M0-40 32 8H16L38 48H-38L-16 8H-32Z" fill="#2F6A4F"/><path d="M0-52l4 8 9 1-7 6 2 9-8-5-8 5 2-9-7-6 9-1z" fill="#FBE36F"/><circle cx="-12" cy="14" r="4" fill="#CC544C"/><circle cx="14" cy="30" r="4" fill="#FBE36F"/><circle cx="4" cy="-8" r="3.5" fill="#FFFDF6"/><circle cx="-20" cy="38" r="3.5" fill="#FFFDF6"/></g>`;
+
+    let roadD = '';
+    E.forEach(([a, b]) => { roadD += `M${N[a][0]} ${N[a][1]}L${N[b][0]} ${N[b][1]}`; });
+
+    let svg = `<svg class="ruta__svg" viewBox="0 0 ${W} ${H}" aria-hidden="true" focusable="false"><defs>`
+      + `<pattern id="rt-stripes" width="130" height="260" patternUnits="userSpaceOnUse"><rect width="130" height="260" fill="#FCECB4"/><path d="M26 0C36 43 36 87 26 130C16 173 16 217 26 260L78 260C67 217 67 173 78 130C89 87 89 43 78 0Z" fill="#FFFDF6" opacity=".8"/></pattern>`
+      + `</defs><rect width="${W}" height="${H}" fill="url(#rt-stripes)"/>`;
+    // calles
+    svg += `<path d="${roadD}" fill="none" stroke="#0A1430" stroke-opacity=".16" stroke-width="44" stroke-linecap="round" stroke-linejoin="round" transform="translate(4 6)"/>`;
+    svg += `<path d="${roadD}" fill="none" stroke="#7E2434" stroke-width="40" stroke-linecap="round" stroke-linejoin="round"/>`;
+    svg += `<path d="${roadD}" fill="none" stroke="#9A3344" stroke-width="26" stroke-linecap="round" stroke-linejoin="round" opacity=".55"/>`;
+    svg += `<path d="${roadD}" fill="none" stroke="#F8DFA6" stroke-width="3" stroke-dasharray="14 16" opacity=".75"/>`;
+    svg += `<path class="ruta__trail" data-ruta-trail d="" />`;
+    // zonas
+    svg += `<text class="rt-zone" x="390" y="660" text-anchor="middle">El Gran</text><text class="rt-zone" x="390" y="722" text-anchor="middle">Mercado</text><text class="rt-zone-s" x="390" y="770" text-anchor="middle">Zona Patio I</text>`;
+    svg += `<text class="rt-zone" x="1300" y="790" text-anchor="middle">La Plaza</text><text class="rt-zone-s" x="1300" y="832" text-anchor="middle">Zona Patio II</text>`;
+    svg += `<text class="rt-porche" x="1295" y="282" text-anchor="middle">Porche</text>`;
+    // árboles
+    svg += tree(70, 170, 1.05) + tree(510, 860, .8) + tree(1062, 640, .8) + tree(1565, 780, .75) + tree(470, 1030, .7) + tree(60, 650, .75);
+    // edificio central (ATECA) con la rotulación del cartel
+    svg += `<g class="rt-ateca"><rect x="692" y="388" width="276" height="520" rx="14" fill="#0A1430" opacity=".12" transform="translate(7 8)"/>`
+      + `<rect x="692" y="388" width="276" height="520" rx="14" fill="#FFFDF6" stroke="#2B1A4F" stroke-width="4"/>`
+      + `<rect x="692" y="388" width="276" height="44" rx="14" fill="#CC544C"/><rect x="692" y="414" width="276" height="18" fill="#CC544C"/>`
+      + `<text class="rt-ateca__t" x="830" y="418" text-anchor="middle">ATECA</text>`
+      + `<image href="assets/img/wordmark.webp" x="712" y="470" width="236" height="75"/>`
+      + `<image href="assets/img/year.webp" x="770" y="552" width="120" height="46"/>`
+      + `<image href="assets/img/date.webp" x="735" y="612" width="190" height="38"/>`
+      + `<image href="assets/img/logo-cifp.webp" x="785" y="672" width="90" height="88"/>`
+      + `<rect x="712" y="800" width="236" height="84" rx="12" fill="#FBF6EC" stroke="#2B1A4F" stroke-width="2.5"/>`
+      + `<text class="rt-radio" x="862" y="836" text-anchor="middle">Radio Atlante</text><text class="rt-radio-s" x="862" y="864" text-anchor="middle">CIFP TONY GALLARDO</text></g>`;
+    // casitas del Gran Mercado
+    svg += stall(250, 150, 156, 168, '#E8892F', '#FFF6E0', ['Mil detalles', 'IFC+21'], { fs: 16 });
+    svg += stall(435, 92, 172, 190, '#E89AAE', '#FFFBF3', [], { n: 9 })
+      + `<image href="assets/img/logo-panateca.webp" x="383" y="166" width="104" height="87"/>`;
+    svg += stall(640, 150, 156, 168, '#8A3B2A', '#FFF1DF', ['Carpintero'], { fs: 17 });
+    svg += stall(330, 790, 156, 160, '#6E9A3E', '#FFF6E0', ['Horno']);
+    svg += stall(640, 790, 156, 160, '#2F4A72', '#E4ECF6', ['Herrero']);
+    // talleres
+    svg += box(140, 505, 190, 104, ['Taller de los', 'recuerdos'], 21);
+    svg += box(16, 984, 250, 104, ['Taller de los', 'superpoderes', 'Espacio NEAE'], 19);
+    svg += box(1035, 398, 228, 96, ['Taller de las', 'sonrisas'], 22);
+    svg += box(730, 52, 420, 100, ['Taller de la aventura', 'y diversión'], 24);
+    svg += box(1350, 40, 240, 120, ['Taller de la', 'alegría y el juego'], 21);
+    svg += box(1035, 846, 160, 86, ['Taller', 'creativo'], 21);
+    svg += box(1285, 846, 196, 86, ['Taller', 'imaginación'], 21);
+    // escenario
+    svg += `<g class="rt-stage"><rect x="1112" y="525" width="380" height="200" rx="20" fill="#0A1430" opacity=".14" transform="translate(8 8)"/>`
+      + `<rect x="1112" y="525" width="380" height="200" rx="20" fill="#FFFBF3" stroke="#2B1A4F" stroke-width="4"/>`
+      + awning(1124, 537, 356, 46, '#CC544C', '#FFFBF3', 14)
+      + `<text class="rt-stage__t" x="1302" y="640" text-anchor="middle">La plaza</text><text class="rt-stage__s" x="1302" y="694" text-anchor="middle">ESCENARIO</text></g>`;
+    // hall
+    svg += `<g><rect x="597" y="1000" width="406" height="86" rx="18" fill="#0A1430" opacity=".14" transform="translate(7 6)"/><rect x="597" y="1000" width="406" height="86" rx="18" fill="#FFFBF3" stroke="#2B1A4F" stroke-width="4"/>`
+      + `<text class="rt-hall" x="800" y="1054" text-anchor="middle">Hall del Centro</text></g>`;
+    // ventorrillos
+    [[840, 218], [1145, 232], [1445, 232]].forEach(([x, y]) => {
+      svg += stall(x, y, 88, 78, '#CC544C', '#FFFBF3', [], { n: 6 });
+    });
+    svg += `<text class="rt-vent" x="840" y="320" text-anchor="middle">VENTORRILLO</text>`;
+    // TonyBand
+    svg += `<text class="rt-band__t" x="1485" y="1052" text-anchor="middle">La TonyBand</text>`;
+    svg += '</svg>';
+
+    /* --- Iconos de las chapas --- */
+    const ICON = {
+      salida: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11 12 4l9 7v9h-6v-6H9v6H3z" fill="currentColor"/></svg>',
+      especial: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-8-5.2-8-11a4.6 4.6 0 0 1 8-3.1A4.6 4.6 0 0 1 20 10c0 5.8-8 11-8 11z" fill="currentColor"/></svg>',
+      cambio: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.5 7.4A5.6 5.6 0 0 0 7 10h7M7 14h7M15.5 16.6A5.6 5.6 0 0 1 7 14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>',
+      ventorrillo: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 9h11v5a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5zM16 10h1.5a2.5 2.5 0 0 1 0 5H16M8 3.5c-1 1.5 1 2 0 3.5M12 3.5c-1 1.5 1 2 0 3.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+      radio: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="2.4" fill="currentColor"/><path d="M7.8 7.8a6 6 0 0 0 0 8.4M16.2 7.8a6 6 0 0 1 0 8.4M4.9 4.9a10 10 0 0 0 0 14.2M19.1 4.9a10 10 0 0 1 0 14.2" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>',
+      tonyband: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V6l11-2v12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><circle cx="6.5" cy="18" r="2.7" fill="currentColor"/><circle cx="17.5" cy="16" r="2.7" fill="currentColor"/></svg>',
+    };
+    const badge = (s) => (s.kind === 'casita' || s.kind === 'taller' ? `<span>${s.n}</span>` : ICON[s.kind]);
+    const kindLabel = (s) => (s.kind === 'casita' ? `Casita ${s.n}` : s.kind === 'taller' ? `Taller ${s.n}` : s.kind === 'salida' ? 'Salida' : 'Taller especial');
+    const at = (x, y) => `left:${f1(x / 16)}%;top:${f1(y / 11)}%`;
+
+    let html = svg;
+    stops.forEach((s, i) => {
+      const [x, y] = N[s.node];
+      html += `<button type="button" class="rpin rpin--${s.kind}" style="${at(x, y)}" data-i="${i}" aria-label="${esc(kindLabel(s))}: ${esc(s.name)}">${badge(s)}<i class="rpin__ok" aria-hidden="true"></i></button>`;
+    });
+    BONUS.forEach((b) => {
+      const info = bonusInfo[b.id];
+      if (info) html += `<button type="button" class="rpin rpin--extra" style="${at(b.at[0], b.at[1])}" data-x="${b.id}" aria-label="Extra: ${esc(info.name)}">${ICON[b.id]}</button>`;
+    });
+    html += `<div class="ruta__walker" data-ruta-walker aria-hidden="true"><span class="ruta__me"><svg viewBox="0 0 24 24"><path d="M6 8h12l-1 12H7z" fill="#CC544C"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8" fill="none" stroke="#0A2150" stroke-width="2" stroke-linecap="round"/><path d="M9.5 13.5c.8 1.2 4.2 1.2 5 0" fill="none" stroke="#FFFBF3" stroke-width="1.8" stroke-linecap="round"/></svg></span></div>`;
+    world.innerHTML = html;
+
+    const walker = $('[data-ruta-walker]', world), trailEl = $('[data-ruta-trail]', world);
+    const pins = $$('.rpin[data-i]', world);
+    const card = $('[data-ruta-card]', sec), kicker = $('[data-ruta-kicker]', sec), nameEl = $('[data-ruta-name]', sec),
+      textEl = $('[data-ruta-text]', sec), moreEl = $('[data-ruta-more]', sec), stepEl = $('[data-ruta-step]', sec),
+      prevBtn = $('[data-ruta-prev]', sec), nextBtn = $('[data-ruta-next]', sec), zoomBtn = $('[data-ruta-zoom]', sec),
+      stampsEl = $('[data-ruta-stamps]', sec), countEl = $('[data-ruta-count]', sec), extrasEl = $('[data-ruta-extras]', sec);
+
+    stampsEl.innerHTML = stops.map((s, i) => `<li><button type="button" class="stamp stamp--${s.kind}" data-i="${i}" aria-label="${esc(s.name)}"><span class="stamp__in">${badge(s)}</span></button></li>`).join('');
+    const stampBtns = $$('.stamp', stampsEl);
+
+    /* --- Estado --- */
+    const parse = (k) => { try { return JSON.parse(store.get(k) || '[]'); } catch { return []; } };
+    const ids = new Set(stops.map((s) => s.id));
+    let done = new Set(parse(KEY).filter((id) => ids.has(id)));
+    const found = new Set(parse(KEYX).filter((id) => bonusInfo[id]));
+    let cur = -1, atNode = 'hall', pos = [...N.hall], walking = null, trail = '', mode = 'all', userAll = false, action = 'start';
+    let finished = done.size === TOTAL;
+
+    const save = () => { store.set(KEY, JSON.stringify([...done])); store.set(KEYX, JSON.stringify([...found])); };
+    const firstMissing = () => stops.findIndex((s) => !done.has(s.id));
+
+    function paintStamps(fresh) {
+      stampBtns.forEach((b, i) => {
+        const s = stops[i], on = done.has(s.id);
+        b.classList.toggle('is-on', on);
+        b.classList.toggle('is-cur', i === cur);
+        b.setAttribute('aria-label', `${s.name}: ${on ? 'sellado' : 'sin sellar'}`);
+        if (on && !b.style.getPropertyValue('--r')) b.style.setProperty('--r', `${Math.round((rng(i * 31 + 7)() - 0.5) * 30)}deg`);
+      });
+      if (fresh !== undefined) { const b = stampBtns[fresh]; b.classList.remove('is-new'); void b.offsetWidth; b.classList.add('is-new'); }
+      pins.forEach((p, i) => { p.classList.toggle('is-done', done.has(stops[i].id)); p.classList.toggle('is-cur', i === cur); if (i === cur) p.setAttribute('aria-current', 'location'); else p.removeAttribute('aria-current'); });
+      countEl.textContent = `${done.size} de ${TOTAL} sellos`;
+      extrasEl.textContent = `Extras encontrados: ${found.size} de ${Object.keys(bonusInfo).length}`;
+    }
+
+    function setCard(k, n, t, more) {
+      kicker.textContent = k; nameEl.textContent = n; textEl.textContent = t;
+      moreEl.replaceChildren(); moreEl.hidden = !more;
+      if (more) moreEl.append(more);
+      card.classList.remove('is-flip'); void card.offsetWidth; card.classList.add('is-flip');
+    }
+    function paintNav() {
+      prevBtn.disabled = cur <= 0;
+      stepEl.textContent = `${Math.max(0, cur + 1)} / ${TOTAL}`;
+      let label;
+      if (finished && (cur === -1 || cur === TOTAL - 1)) { action = 'again'; label = 'Otra vuelta'; }
+      else if (cur === -1) { action = 'start'; label = done.size ? 'Seguir' : 'Empezar'; }
+      else if (cur === TOTAL - 1) { action = 'missing'; label = 'Ir al sello que falta'; }
+      else { action = 'next'; label = 'Siguiente'; }
+      nextBtn.innerHTML = `${label} <span aria-hidden="true">${action === 'again' ? '↺' : '→'}</span>`;
+    }
+    function showStop(i) {
+      const s = stops[i];
+      let more = null;
+      if (s.link) { more = s.link.cloneNode(true); more.className = 'ruta__link'; more.textContent = `${s.link.textContent} ↓`; }
+      const left = stops.filter((x) => x.id !== s.id && !done.has(x.id)).length;
+      if (i === TOTAL - 1 && left) {
+        more = d.createTextNode(`Te ${left === 1 ? 'falta 1 sello' : `faltan ${left} sellos`} para completar el pasaporte.`);
+      }
+      setCard(`${kindLabel(s)} · ${s.zone}`, s.name, s.text, more);
+    }
+    function showIntro() {
+      if (finished) setCard('Pasaporte completo', '¡Catorce de catorce!', 'Ya has recorrido MercaBásica de punta a punta. Ahora solo falta hacerlo en persona el 11 de diciembre.');
+      else if (done.size) setCard('Pasaporte MercaBásica', `Llevas ${done.size} de ${TOTAL} sellos`, '¿Seguimos? Te llevamos a la primera parada que te falta.');
+    }
+    function finale() {
+      setCard('Pasaporte completo', '¡Catorce de catorce!', 'Has recorrido MercaBásica de punta a punta: casitas, talleres y escenario. Ahora solo falta hacerlo en persona el 11 de diciembre.');
+      mode = 'all'; paintZoom(); kick();
+      confetti();
+    }
+
+    /* --- Caminar --- */
+    function goTo(i) {
+      if (i < 0 || i >= TOTAL) return;
+      if (walking) endWalk();
+      const s = stops[i];
+      cur = i;
+      if (mode === 'all' && !userAll) mode = 'near';
+      showStop(i); paintNav(); paintStamps(); paintZoom();
+      const pts = atNode === s.node ? [N[s.node]] : path(atNode, s.node);
+      atNode = s.node;
+      if (pts.length < 2 || reduced()) { pos = [...N[s.node]]; addTrail(pts); arrive(i); kick(); return; }
+      const cum = [0];
+      for (let k = 1; k < pts.length; k++) cum.push(cum[k - 1] + Math.hypot(pts[k][0] - pts[k - 1][0], pts[k][1] - pts[k - 1][1]));
+      const L = cum[cum.length - 1];
+      walking = { i, pts, cum, L, t0: performance.now(), dur: clamp(L / 560, 0.55, 2.6) * 1000 };
+      walker.classList.add('is-walking');
+      kick();
+    }
+    function pointAt(w, dd) {
+      let k = 1;
+      while (k < w.cum.length - 1 && w.cum[k] < dd) k++;
+      const a = w.pts[k - 1], b = w.pts[k], seg = w.cum[k] - w.cum[k - 1] || 1, t = clamp((dd - w.cum[k - 1]) / seg, 0, 1);
+      return { p: [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t], k };
+    }
+    function partial(w, dd) {
+      if (!w) return '';
+      const { p, k } = pointAt(w, dd);
+      return `M${w.pts.slice(0, k).map((q) => q.join(' ')).join('L')}L${f1(p[0])} ${f1(p[1])}`;
+    }
+    function addTrail(pts) { if (pts.length > 1) trail += `M${pts.map((q) => q.join(' ')).join('L')}`; trailEl.setAttribute('d', trail); }
+    function endWalk() {
+      const w = walking;
+      walking = null;
+      pos = [...w.pts[w.pts.length - 1]];
+      addTrail(w.pts);
+      walker.classList.remove('is-walking');
+      arrive(w.i);
+    }
+    function arrive(i) {
+      const s = stops[i];
+      walker.classList.remove('is-hop'); void walker.offsetWidth; walker.classList.add('is-hop');
+      if (done.has(s.id)) { paintStamps(); return; }
+      done.add(s.id); save();
+      paintStamps(i);
+      if (done.size === TOTAL && !finished) { finished = true; finale(); }
+      else if (i === TOTAL - 1) showStop(i);
+      paintNav();
+    }
+    function reset() {
+      done = new Set(); finished = false; trail = ''; trailEl.setAttribute('d', '');
+      save();
+      stampBtns.forEach((b) => b.style.removeProperty('--r'));
+      atNode = stops[0].node; pos = [...N[atNode]]; cur = -1;
+      goTo(0);
+    }
+
+    /* --- Cámara: sigue al caminante --- */
+    const cam = { x: W / 2, y: H / 2, s: 1 };
+    let raf = 0, last = 0;
+    function target() {
+      const vw = mapEl.clientWidth, vh = mapEl.clientHeight, u = vw / W;
+      const fit = Math.min(1, vh / (H * u));
+      if (mode === 'all') return { x: W / 2, y: H / 2, s: fit, u, vw, vh };
+      return { x: pos[0], y: pos[1], s: Math.max(fit, (vw < 640 ? 2.5 : 1.75) * fit), u, vw, vh };
+    }
+    function fitAxis(c, half, size) { return half * 2 >= size ? size / 2 : clamp(c, half, size - half); }
+    function tick(now) {
+      raf = 0;
+      const dt = Math.min(0.05, (now - last) / 1000 || 0.016);
+      last = now;
+      if (walking) {
+        const k = clamp((now - walking.t0) / walking.dur, 0, 1);
+        const e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+        const dd = e * walking.L;
+        pos = pointAt(walking, dd).p;
+        trailEl.setAttribute('d', trail + partial(walking, dd));
+        if (k >= 1) endWalk();
+      }
+      walker.style.left = `${f1(pos[0] / 16)}%`;
+      walker.style.top = `${f1(pos[1] / 11)}%`;
+      const t = target();
+      const a = reduced() ? 1 : 1 - Math.exp(-dt * 5.5);
+      cam.s += (t.s - cam.s) * a; cam.x += (t.x - cam.x) * a; cam.y += (t.y - cam.y) * a;
+      const pxu = cam.s * t.u;
+      const cx = fitAxis(cam.x, t.vw / (2 * pxu), W), cy = fitAxis(cam.y, t.vh / (2 * pxu), H);
+      world.style.transform = `translate3d(${f1(t.vw / 2 - cx * pxu)}px,${f1(t.vh / 2 - cy * pxu)}px,0) scale(${cam.s.toFixed(4)})`;
+      const settled = Math.abs(t.s - cam.s) < 0.001 && Math.abs(t.x - cam.x) < 0.4 && Math.abs(t.y - cam.y) < 0.4;
+      if (walking || !settled) raf = requestAnimationFrame(tick);
+    }
+    function kick() { if (!raf) { last = performance.now(); raf = requestAnimationFrame(tick); } }
+    function paintZoom() {
+      zoomBtn.textContent = mode === 'all' ? 'Acercar' : 'Ver todo el mapa';
+      zoomBtn.hidden = cur === -1;
+    }
+
+    /* --- Confeti al completar --- */
+    function confetti() {
+      if (reduced()) return;
+      const box = d.createElement('div');
+      box.className = 'ruta__confetti';
+      box.setAttribute('aria-hidden', 'true');
+      const cols = ['#CC544C', '#FBE36F', '#0B74C4', '#2F6A4F', '#C94B6D', '#D99A2B', '#FFFDF6'];
+      const R = rng(Date.now() % 9973);
+      for (let k = 0; k < 90; k++) {
+        const p = d.createElement('i');
+        p.style.cssText = `left:${f1(R() * 100)}%;background:${cols[k % cols.length]};--dx:${f1((R() - 0.5) * 160)}px;--rot:${Math.round(R() * 900 - 450)}deg;animation-delay:${f1(R() * 0.6)}s;animation-duration:${f1(2.2 + R() * 1.6)}s;width:${f1(6 + R() * 8)}px;height:${f1(8 + R() * 10)}px`;
+        box.append(p);
+      }
+      mapEl.append(box);
+      setTimeout(() => box.remove(), 4800);
+    }
+
+    /* --- Eventos --- */
+    world.addEventListener('click', (e) => {
+      const pin = e.target.closest('.rpin');
+      if (!pin) return;
+      if (pin.dataset.i !== undefined) { goTo(+pin.dataset.i); return; }
+      const id = pin.dataset.x, info = bonusInfo[id];
+      if (!info) return;
+      const isNew = !found.has(id);
+      found.add(id); save(); paintStamps();
+      pin.classList.remove('is-pop'); void pin.offsetWidth; pin.classList.add('is-pop');
+      setCard(isNew ? '¡Extra encontrado!' : 'Extra', info.name, info.text);
+    });
+    stampsEl.addEventListener('click', (e) => { const b = e.target.closest('.stamp'); if (b) goTo(+b.dataset.i); });
+    prevBtn.addEventListener('click', () => goTo(cur - 1));
+    nextBtn.addEventListener('click', () => {
+      if (action === 'again') reset();
+      else if (action === 'start') goTo(done.size ? Math.max(0, firstMissing()) : 0);
+      else if (action === 'missing') { const m = firstMissing(); goTo(m < 0 ? 0 : m); }
+      else goTo(cur + 1);
+    });
+    zoomBtn.addEventListener('click', () => { mode = mode === 'all' ? 'near' : 'all'; userAll = mode === 'all'; paintZoom(); kick(); });
+    game.addEventListener('keydown', (e) => {
+      if (e.target.closest('input, textarea')) return;
+      if (e.key === 'ArrowRight') { e.preventDefault(); nextBtn.click(); }
+      else if (e.key === 'ArrowLeft' && cur > 0) { e.preventDefault(); goTo(cur - 1); }
+    });
+    if ('ResizeObserver' in window) new ResizeObserver(() => kick()).observe(mapEl);
+    else addEventListener('resize', kick);
+
+    sec.classList.add('is-game');
+    game.hidden = false;
+    paintStamps(); paintNav(); paintZoom(); showIntro();
+    kick();
   }
-  if (track) track.addEventListener('scroll', () => { if (!routePinned) updateRoute(); }, { passive: true });
 
   /* ------------------------------------------------------------------
      Tique: impresión, código de barras y nota a mano
@@ -481,21 +843,13 @@
   $$('main > section[id]').forEach((s) => sio.observe(s));
 
   /* ------------------------------------------------------------------
-     Bucle de scroll
+     Recolocar al cambiar el tamaño
      ------------------------------------------------------------------ */
-  let ticking = false;
-  const onScroll = () => {
-    if (ticking) return;
-    ticking = true;
-    requestAnimationFrame(() => { ticking = false; updateRoute(); });
-  };
-  addEventListener('scroll', onScroll, { passive: true });
   let rt = 0;
-  addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { layoutRoute(); placeNote(); onScroll(); }, 120); });
+  addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(placeNote, 120); });
   mqReduce.addEventListener?.('change', () => location.reload());
 
-  layoutRoute();
   placeNote();
-  if (d.fonts && d.fonts.ready) d.fonts.ready.then(() => { layoutRoute(); placeNote(); });
-  addEventListener('load', () => { layoutRoute(); placeNote(); });
+  if (d.fonts && d.fonts.ready) d.fonts.ready.then(placeNote);
+  addEventListener('load', placeNote);
 })();

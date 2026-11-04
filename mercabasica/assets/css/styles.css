@@ -432,64 +432,188 @@ p { text-wrap: pretty; }
 }
 
 /* ==========================================================================
-   03 · Recorrido (seis casas)
+   03 · Recorrido (mapa jugable con pasaporte)
    ========================================================================== */
-.route { position: relative; background: var(--paper); }
-.route__pin { position: relative; padding: clamp(90px, 12vw, 150px) 0 clamp(70px, 9vw, 110px); }
-.route__track { display: flex; gap: clamp(16px, 2vw, 30px); padding: 0 var(--gutter); }
-.route__intro { flex: 0 0 clamp(300px, 34vw, 500px); display: flex; flex-direction: column; justify-content: center; padding-right: clamp(0px, 2vw, 30px); }
-.route__title { margin: 1.8rem 0 1.4rem; font-family: var(--f-serif); font-weight: 400; font-size: var(--step-4); line-height: .95; letter-spacing: -.035em; font-variation-settings: "SOFT" 60; }
-.route__title em { display: block; color: var(--holly); font-variation-settings: "SOFT" 100, "WONK" 1; }
-.route__intro p { max-width: 36ch; }
-.route__hint { margin-top: 1rem; rotate: -2deg; }
+.ruta { position: relative; padding: clamp(90px, 12vw, 150px) 0 clamp(70px, 9vw, 110px); background: var(--paper); }
+.ruta__head { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: clamp(1rem, 4vw, 4rem); align-items: end; margin-top: 1.8rem; }
+.ruta__title { margin: 0; font-family: var(--f-serif); font-weight: 400; font-size: var(--step-4); line-height: .95; letter-spacing: -.035em; font-variation-settings: "SOFT" 60; }
+.ruta__title em { display: block; color: var(--holly); font-variation-settings: "SOFT" 100, "WONK" 1; }
+.ruta__intro p { max-width: 42ch; }
+.ruta__how { margin: 0; font-size: .98rem; opacity: .85; }
+.ruta:not(.is-game) .ruta__how { display: none; }
 
-.casa { position: relative; flex: 0 0 clamp(290px, 27vw, 390px); display: flex; flex-direction: column; min-height: 560px; }
-.casa__awning { height: 82px; z-index: 2; }
-.casa__awning svg { filter: drop-shadow(0 6px 5px rgba(10, 33, 80, .14)); }
-.casa:hover .tab { animation: flutter 1.8s ease-in-out infinite; animation-delay: calc(var(--i) * -.12s); }
-.casa__sign {
-  position: absolute; left: 22px; top: 64px; z-index: 3;
-  padding: 0 .75rem .1rem; border: 2px solid var(--c); border-radius: 4px; background: #FFFDF6;
-  font-family: var(--f-hand); font-weight: 700; font-size: 1.55rem; line-height: 1.25; color: var(--c);
-  rotate: -4deg; box-shadow: 0 6px 10px -6px rgba(10, 33, 80, .35);
+.ruta__game { display: grid; grid-template-columns: minmax(0, 1fr) clamp(300px, 27vw, 370px); gap: clamp(1rem, 2vw, 1.6rem); align-items: start; margin-top: clamp(2rem, 4vw, 3rem); }
+.ruta__game[hidden], .ruta__more[hidden], .ruta__tool[hidden] { display: none; }
+
+/* El mapa: una ventana con cámara que sigue al caminante */
+.ruta__map {
+  position: relative; aspect-ratio: 16 / 11; overflow: hidden; isolation: isolate;
+  border: 3px solid var(--navy); border-radius: 22px; background: #FCECB4;
+  box-shadow: 6px 6px 0 var(--navy);
 }
-.casa__body {
-  position: relative; flex: 1; display: flex; flex-direction: column; gap: .85rem;
-  margin: -8px 9px 0; padding: 2.6rem 1.4rem 1.4rem;
-  background: var(--tint);
-  border-inline: 6px solid var(--c); border-bottom: 6px solid var(--c);
-  border-radius: 0 0 4px 4px;
+.ruta__world { position: absolute; left: 0; top: 0; width: 100%; aspect-ratio: 16 / 11; transform-origin: 0 0; container-type: inline-size; }
+.ruta__svg { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
+.ruta__trail { fill: none; stroke: #FBE36F; stroke-width: 11; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: .1 24; }
+
+.rt-lab { font-family: var(--f-sans); font-weight: 800; fill: #2B1A4F; text-transform: uppercase; letter-spacing: .02em; }
+.rt-zone { font-family: var(--f-serif); font-weight: 700; font-size: 62px; fill: #2B1A4F; letter-spacing: -.02em; font-variation-settings: "SOFT" 100, "WONK" 1; }
+.rt-zone-s, .rt-porche, .rt-small, .rt-band__t { font-family: var(--f-hand); font-weight: 700; fill: #2B1A4F; }
+.rt-zone-s { font-size: 40px; fill: #A63A31; }
+.rt-porche { font-size: 60px; }
+.rt-small { font-size: 30px; }
+.rt-band__t { font-size: 44px; }
+.rt-ateca__t { font-family: var(--f-mono); font-size: 22px; letter-spacing: .45em; fill: #FFFBF3; }
+.rt-radio { font-family: var(--f-sans); font-weight: 800; font-size: 28px; fill: #2B1A4F; }
+.rt-radio-s { font-family: var(--f-mono); font-size: 12px; letter-spacing: .2em; fill: #A63A31; }
+.rt-stage__t { font-family: var(--f-serif); font-weight: 800; font-size: 70px; fill: #2B1A4F; font-variation-settings: "SOFT" 100, "WONK" 1; }
+.rt-stage__s { font-family: var(--f-sans); font-weight: 800; font-size: 40px; letter-spacing: .08em; fill: var(--navy); }
+.rt-hall { font-family: var(--f-serif); font-weight: 700; font-size: 50px; fill: #2B1A4F; }
+.rt-vent { font-family: var(--f-sans); font-weight: 800; font-size: 17px; letter-spacing: .06em; fill: var(--holly); }
+
+/* Chapas de las paradas (miden en relación con el ancho del plano) */
+.rpin {
+  position: absolute; z-index: 2; translate: -50% -50%;
+  display: grid; place-items: center; width: 4.6cqw; aspect-ratio: 1; padding: 0;
+  border: .3cqw solid #FFFBF3; border-radius: 50%;
+  font-family: var(--f-sans); font-weight: 800; font-size: 2.5cqw; line-height: 1;
+  cursor: pointer; transition: scale .2s var(--ease-out);
+  box-shadow: 0 .35cqw 0 rgba(10, 20, 48, .35), 0 .7cqw 1.2cqw rgba(10, 20, 48, .25);
 }
-.casa__body > p { margin: 0; font-size: .98rem; line-height: 1.5; }
-.casa__num { font-family: var(--f-mono); font-size: .68rem !important; letter-spacing: .16em; text-transform: uppercase; color: var(--c); }
-.casa__q { margin: 0; max-width: 11ch; font-family: var(--f-serif); font-weight: 600; font-size: clamp(1.75rem, 1.2rem + 1.5vw, 2.55rem); line-height: 1; letter-spacing: -.025em; font-variation-settings: "SOFT" 100; }
-.casa__chips { display: flex; flex-wrap: wrap; gap: .4rem; margin: auto 0 0; padding: 1rem 0 0; list-style: none; border-top: 1.5px dashed color-mix(in srgb, var(--c) 45%, transparent); }
-.casa__chips li { padding: .32em .7em; border: 1.5px solid var(--c); border-radius: 999px; background: rgba(255, 255, 255, .6); font-family: var(--f-mono); font-size: .64rem; letter-spacing: .06em; text-transform: uppercase; }
-.casa__doodle { position: absolute; right: 12px; top: 18px; width: 78px; height: 78px; color: var(--c); overflow: visible; }
-.casa__doodle path { fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 0; }
-.js .casa__doodle path { stroke-dashoffset: 1; transition: stroke-dashoffset 1.4s ease .2s; }
-.js .casa.is-in .casa__doodle path { stroke-dashoffset: 0; }
+.rpin span { position: relative; z-index: 1; }
+.rpin svg { position: relative; z-index: 1; width: 56%; height: 56%; }
+.rpin:hover { scale: 1.14; }
+.rpin:focus-visible { outline: .3cqw dashed var(--navy); outline-offset: .5cqw; }
+.rpin--taller { background: #C4461C; color: #FFFBF3; }
+.rpin--salida { background: var(--navy); color: var(--butter); }
+.rpin--especial { background: #C94B6D; color: #FFFBF3; }
+.rpin--casita { width: 4.4cqw; aspect-ratio: .82; border: 0; border-radius: 0; background: none; box-shadow: none; color: var(--ink); filter: drop-shadow(0 .35cqw 0 rgba(10, 20, 48, .3)); font-size: 2.9cqw; }
+.rpin--casita span { top: -.5cqw; }
+.rpin--casita::before { content: ""; position: absolute; inset: 0; background: #FBD13F; clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 84%, 0 100%); }
+.rpin--extra { z-index: 1; width: 3.1cqw; border-width: .22cqw; background: #8E36AE; color: #FFFBF3; }
+.rpin::after { content: ""; position: absolute; inset: -.9cqw; border: .35cqw solid #FBE36F; border-radius: 50%; opacity: 0; pointer-events: none; }
+.rpin.is-cur::after { animation: rpulse 1.7s var(--ease-out) infinite; }
+.rpin.is-cur { z-index: 3; }
+.rpin__ok { position: absolute; right: -.8cqw; top: -.8cqw; z-index: 2; display: none; width: 2.1cqw; height: 2.1cqw; border: .2cqw solid #FFFBF3; border-radius: 50%; background: var(--holly) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M5 10.5l3.2 3.2L15 6.6' fill='none' stroke='%23FFFBF3' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 80% no-repeat; }
+.rpin.is-done .rpin__ok { display: block; animation: rpop .45s var(--ease-out); }
+.rpin.is-pop { animation: rpop .5s var(--ease-out); }
 
-.route__end { flex: 0 0 clamp(300px, 34vw, 480px); display: flex; flex-direction: column; justify-content: center; padding: 0 clamp(10px, 3vw, 50px); }
-.route__end p { margin: 0 0 1rem; font-family: var(--f-mono); font-size: .74rem; letter-spacing: .14em; text-transform: uppercase; }
-.route__end .route__end-big { font-family: var(--f-serif); font-size: var(--step-2); line-height: 1.12; letter-spacing: -.02em; text-transform: none; }
-.route__end-big em { color: var(--tomato); font-variation-settings: "SOFT" 100, "WONK" 1; }
-
-.route__progress { position: absolute; left: var(--gutter); right: var(--gutter); bottom: clamp(22px, 4vh, 44px); height: 2px; background: repeating-linear-gradient(90deg, rgba(10, 33, 80, .25) 0 8px, transparent 8px 14px); }
-.route__progress span { position: absolute; left: 0; top: -1px; height: 4px; width: 100%; background: var(--navy); border-radius: 2px; transform-origin: left; transform: scaleX(var(--p, 0)); }
-
-/* Escritorio: calle horizontal anclada */
-@media (min-width: 900px) and (prefers-reduced-motion: no-preference) {
-  .route.is-pinned .route__pin { position: sticky; top: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column; justify-content: center; padding: calc(var(--beam) + 24px) 0 70px; }
-  .route.is-pinned .route__track { will-change: transform; align-items: stretch; }
-  .route.is-pinned .casa { min-height: 0; height: min(70vh, 600px); }
+/* El caminante */
+.ruta__walker { position: absolute; z-index: 4; width: 5.2cqw; aspect-ratio: 1; translate: -50% -100%; pointer-events: none; }
+.ruta__walker::after { content: ""; position: absolute; left: 50%; bottom: -12%; width: 58%; height: 20%; translate: -50% 0; border-radius: 50%; background: rgba(10, 20, 48, .3); }
+.ruta__me {
+  position: relative; z-index: 1; display: grid; place-items: center; width: 100%; height: 100%;
+  border: .35cqw solid var(--navy); border-radius: 50% 50% 0 50%; rotate: 45deg; background: #FFFBF3;
+  box-shadow: .25cqw .25cqw 0 var(--navy);
 }
-/* Móvil y movimiento reducido: carrusel con scroll-snap */
-@media (max-width: 899px), (prefers-reduced-motion: reduce) {
-  .route__track { overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 2.2rem; scrollbar-width: thin; }
-  .route__intro, .route__end { flex-basis: min(84vw, 420px); scroll-snap-align: start; }
-  .casa { flex-basis: min(82vw, 380px); scroll-snap-align: center; min-height: 520px; }
-  .route__progress { bottom: clamp(40px, 6vw, 60px); }
+.ruta__me svg { width: 60%; height: 60%; rotate: -45deg; }
+.ruta__walker.is-walking .ruta__me { animation: rbob .3s ease-in-out infinite alternate; }
+.ruta__walker.is-hop .ruta__me { animation: rhop .5s var(--ease-out); }
+
+/* Herramientas sobre el mapa */
+.ruta__tools { position: absolute; top: 12px; right: 12px; z-index: 6; }
+.ruta__tool {
+  padding: .5rem .85rem; border: 2px solid var(--navy); border-radius: 999px; background: var(--cream); color: var(--navy);
+  font-family: var(--f-mono); font-size: .66rem; font-weight: 500; letter-spacing: .1em; text-transform: uppercase;
+  box-shadow: 2px 2px 0 var(--navy); cursor: pointer;
+}
+.ruta__tool:hover { translate: -1px -1px; box-shadow: 3px 3px 0 var(--navy); }
+.ruta__legend {
+  display: flex; flex-wrap: wrap; gap: .4rem 1.4rem; margin: 1.1rem 0 0; padding: 0 .3rem; list-style: none;
+  font-family: var(--f-mono); font-size: .6rem; letter-spacing: .08em; text-transform: uppercase;
+}
+.lg { display: inline-block; width: 12px; height: 12px; margin-right: .5rem; vertical-align: -2px; border-radius: 50%; }
+.lg--casita { border-radius: 0; background: #FBD13F; clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 80%, 0 100%); }
+.lg--taller { background: #C4461C; }
+.lg--extra { background: #8E36AE; }
+
+.ruta__confetti { position: absolute; inset: 0; z-index: 7; overflow: hidden; pointer-events: none; }
+.ruta__confetti i { position: absolute; top: -6%; border-radius: 2px; animation: rfall linear forwards; }
+
+/* Ficha y pasaporte */
+.ruta__card { display: grid; gap: 1rem; }
+.ruta__ticket {
+  position: relative; min-height: 15.5rem; padding: 1.5rem 1.4rem 1.4rem;
+  border: 2px solid var(--navy); border-radius: 16px; background: var(--cream); box-shadow: 5px 5px 0 var(--navy);
+}
+.ruta__ticket::before { content: ""; position: absolute; left: 1.4rem; right: 1.4rem; top: .7rem; height: 0; border-top: 2px dashed rgba(10, 33, 80, .2); }
+.ruta__ticket.is-flip { animation: rflip .45s var(--ease-out); }
+.ruta__kicker { margin: .35rem 0 0; font-family: var(--f-mono); font-size: .68rem; letter-spacing: .13em; text-transform: uppercase; color: #A63A31; }
+.ruta__name { margin: .55rem 0 .75rem; font-family: var(--f-serif); font-weight: 600; font-size: clamp(1.55rem, 1.2rem + 1vw, 2.15rem); line-height: 1.04; letter-spacing: -.02em; font-variation-settings: "SOFT" 100; }
+.ruta__text { margin: 0; font-size: 1rem; line-height: 1.5; }
+.ruta__more { margin: 1rem 0 0; font-family: var(--f-mono); font-size: .72rem; letter-spacing: .06em; text-transform: uppercase; color: #A63A31; }
+.ruta__link { color: var(--navy); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+
+.ruta__nav { display: flex; align-items: center; gap: .8rem; }
+.ruta__arrow {
+  display: grid; place-items: center; flex: none; width: 48px; height: 48px; padding: 0;
+  border: 2px solid var(--navy); border-radius: 50%; background: var(--cream); font-size: 1.15rem;
+  box-shadow: 3px 3px 0 var(--navy); cursor: pointer; transition: translate .18s ease, box-shadow .18s ease;
+}
+.ruta__arrow:hover:not(:disabled) { translate: -2px -2px; box-shadow: 5px 5px 0 var(--navy); }
+.ruta__arrow:disabled { opacity: .35; cursor: default; }
+.ruta__step { flex: 1; text-align: center; font-family: var(--f-mono); font-size: .8rem; letter-spacing: .1em; font-variant-numeric: tabular-nums; }
+.ruta__next { flex: none; }
+
+.ruta__passport { padding: 1.05rem 1.1rem 1rem; border: 2px dashed rgba(10, 33, 80, .35); border-radius: 16px; background: var(--paper-2); }
+.ruta__ptitle { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; margin: 0; font-family: var(--f-mono); font-size: .68rem; letter-spacing: .13em; text-transform: uppercase; }
+.ruta__ptitle b { font-family: var(--f-serif); font-size: 1rem; font-weight: 700; letter-spacing: 0; text-transform: none; font-variation-settings: "SOFT" 100; }
+.ruta__stamps { display: grid; grid-template-columns: repeat(7, 1fr); gap: .45rem; margin: .85rem 0 .75rem; padding: 0; list-style: none; }
+.stamp {
+  --sc: var(--navy);
+  display: grid; place-items: center; width: 100%; aspect-ratio: 1; padding: 0;
+  border: 2px dashed rgba(10, 33, 80, .32); border-radius: 50%; background: transparent; color: rgba(10, 33, 80, .4);
+  font-family: var(--f-sans); font-weight: 800; font-size: .85rem; line-height: 1; cursor: pointer;
+}
+.stamp svg { width: 48%; height: 48%; }
+.stamp--casita { --sc: #94640F; }
+.stamp--taller { --sc: #B23E18; }
+.stamp--especial { --sc: #A3364F; }
+.stamp.is-on {
+  border: 2.5px solid var(--sc); color: var(--sc); rotate: var(--r, 0deg);
+  background: color-mix(in srgb, var(--sc) 10%, var(--cream));
+  box-shadow: inset 0 0 0 2.5px var(--cream), inset 0 0 0 4px color-mix(in srgb, var(--sc) 70%, transparent);
+}
+.stamp.is-cur { outline: 2px solid var(--navy); outline-offset: 2px; }
+.stamp.is-new { animation: rstamp .55s var(--ease-out); }
+.ruta__extras { margin: 0; font-family: var(--f-mono); font-size: .64rem; letter-spacing: .1em; text-transform: uppercase; opacity: .75; }
+
+/* Sin JS: lista del recorrido */
+.ruta__list { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; margin: 2.4rem 0 0; padding: 0; list-style: none; }
+.ruta__list li { padding: 1.1rem 1.2rem; border: 2px solid var(--navy); border-radius: 14px; background: var(--cream); }
+.ruta__list h3 { margin: 0 0 .4rem; font-family: var(--f-serif); font-size: 1.25rem; }
+.ruta__list p { margin: 0; font-size: .95rem; }
+.ruta.is-game .ruta__list, .ruta__bonus { display: none; }
+
+.ruta__end { max-width: 54rem; margin-top: clamp(3rem, 6vw, 5rem); }
+.ruta__end p { margin: 0 0 1rem; font-family: var(--f-mono); font-size: .74rem; letter-spacing: .14em; text-transform: uppercase; }
+.ruta__end .ruta__end-big { font-family: var(--f-serif); font-size: var(--step-2); line-height: 1.12; letter-spacing: -.02em; text-transform: none; }
+.ruta__end-big em { color: var(--tomato); font-variation-settings: "SOFT" 100, "WONK" 1; }
+
+@keyframes rpulse { 0% { opacity: .95; scale: .8; } 100% { opacity: 0; scale: 1.5; } }
+@keyframes rpop { 0% { scale: .4; } 60% { scale: 1.25; } 100% { scale: 1; } }
+@keyframes rbob { from { translate: 0 0; } to { translate: 0 -14%; } }
+@keyframes rhop { 0% { translate: 0 0; } 35% { translate: 0 -30%; } 70% { translate: 0 4%; } 100% { translate: 0 0; } }
+@keyframes rflip { from { opacity: .55; transform: translateY(10px) rotate(-.8deg); } to { opacity: 1; transform: none; } }
+@keyframes rstamp { 0% { transform: scale(2.3); opacity: 0; } 55% { transform: scale(.88); opacity: 1; } 100% { transform: scale(1); } }
+@keyframes rfall { to { top: 106%; transform: translateX(var(--dx)) rotate(var(--rot)); } }
+
+@media (max-width: 1000px) {
+  .ruta__head { grid-template-columns: 1fr; }
+  .ruta__game { grid-template-columns: 1fr; }
+  .ruta__card { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; }
+  .ruta__ticket { grid-row: span 2; }
+}
+@media (max-width: 700px) {
+  .ruta__card { grid-template-columns: 1fr; }
+  .ruta__ticket { grid-row: auto; min-height: 0; }
+  .ruta__nav { order: -1; }
+  .ruta__legend { margin-top: .8rem; }
+  .ruta__map { aspect-ratio: 1 / 1; border-radius: 16px; box-shadow: 4px 4px 0 var(--navy); }
+  .ruta__nav .btn { padding-inline: 1rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rpin.is-cur::after, .ruta__walker .ruta__me, .ruta__ticket.is-flip, .stamp.is-new { animation: none !important; }
+  .rpin.is-cur::after { opacity: 1; scale: 1.1; }
 }
 
 /* ==========================================================================
@@ -721,9 +845,7 @@ p { text-wrap: pretty; }
 
 /* Contraste AA (4.5:1) en textos pequeños */
 .calendar__top { background: #A63A31; }
-.casa__num { color: color-mix(in srgb, var(--c) 68%, #000); }
 .hero__lead em { color: #A63A31; }
-.casa__sign { color: color-mix(in srgb, var(--c) 72%, #000); }
 .pana__quote em, .pana__title em { color: #A3364F; }
 .recipe__head, .recipe__list em { color: #A3364F; }
 @media (min-width: 900px) { .consent { left: auto; right: 16px; } }
