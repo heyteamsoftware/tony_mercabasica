@@ -268,20 +268,75 @@
   }
 
   /* ------------------------------------------------------------------
-     Carteles: visor
+     Media: pestañas por año y visor con anterior / siguiente
      ------------------------------------------------------------------ */
+  const tabsBox = $('[data-media-tabs]');
+  if (tabsBox) {
+    const tabs = $$('[role="tab"]', tabsBox);
+    const panels = tabs.map((t) => d.getElementById(t.getAttribute('aria-controls')));
+    const select = (i, focus) => {
+      tabs.forEach((t, k) => {
+        const on = k === i;
+        t.setAttribute('aria-selected', String(on));
+        t.tabIndex = on ? 0 : -1;
+        panels[k].hidden = !on;
+        if (!on) $$('video', panels[k]).forEach((v) => v.pause());
+      });
+      if (focus) tabs[i].focus();
+    };
+    tabs.forEach((t, i) => {
+      t.addEventListener('click', () => select(i));
+      t.addEventListener('keydown', (e) => {
+        const k = { ArrowRight: 1, ArrowLeft: -1 }[e.key];
+        if (k) { e.preventDefault(); select((i + k + tabs.length) % tabs.length, true); }
+        if (e.key === 'Home') { e.preventDefault(); select(0, true); }
+        if (e.key === 'End') { e.preventDefault(); select(tabs.length - 1, true); }
+      });
+    });
+    tabsBox.hidden = false;
+    select(0);
+  }
+
   const lb = $('[data-lightbox]');
   if (lb && typeof lb.showModal === 'function') {
     const img = $('[data-lightbox-img]', lb);
-    $$('[data-poster]').forEach((b) => b.addEventListener('click', () => {
-      img.src = b.dataset.poster;
+    const cap = $('[data-lightbox-cap]', lb);
+    const count = $('[data-lightbox-count]', lb);
+    const prev = $('[data-lightbox-prev]', lb);
+    const next = $('[data-lightbox-next]', lb);
+    let list = [], idx = 0, opener = null;
+    const show = (i) => {
+      idx = (i + list.length) % list.length;
+      const b = list[idx];
+      img.src = b.dataset.media;
       img.alt = $('img', b).alt;
+      cap.textContent = b.dataset.cap || '';
+      count.textContent = `${idx + 1} / ${list.length}`;
+      const many = list.length > 1;
+      prev.hidden = next.hidden = count.hidden = !many;
+      // precarga la siguiente
+      if (many) { const pre = new Image(); pre.src = list[(idx + 1) % list.length].dataset.media; }
+    };
+    $$('[data-media]').forEach((b) => b.addEventListener('click', () => {
+      list = $$('[data-media]', b.closest('[data-gallery]'));
+      opener = b;
+      show(list.indexOf(b));
       lb.showModal();
     }));
+    prev.addEventListener('click', () => show(idx - 1));
+    next.addEventListener('click', () => show(idx + 1));
+    lb.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') { e.preventDefault(); show(idx - 1); }
+      if (e.key === 'ArrowRight') { e.preventDefault(); show(idx + 1); }
+    });
+    let sx = 0;
+    lb.addEventListener('touchstart', (e) => { sx = e.touches[0].clientX; }, { passive: true });
+    lb.addEventListener('touchend', (e) => { const dx = e.changedTouches[0].clientX - sx; if (Math.abs(dx) > 50) show(idx + (dx < 0 ? 1 : -1)); });
     $('[data-lightbox-close]', lb).addEventListener('click', () => lb.close());
     lb.addEventListener('click', (e) => { if (e.target === lb) lb.close(); });
+    lb.addEventListener('close', () => { if (opener) opener.focus({ preventScroll: true }); });
   } else {
-    $$('[data-poster]').forEach((b) => b.addEventListener('click', () => window.open(b.dataset.poster, '_blank', 'noopener')));
+    $$('[data-media]').forEach((b) => b.addEventListener('click', () => window.open(b.dataset.media, '_blank', 'noopener')));
   }
 
   /* ------------------------------------------------------------------

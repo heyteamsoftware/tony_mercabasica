@@ -30,12 +30,12 @@
   <link rel="preload" as="font" type="font/woff2" href="assets/fonts/Fraunces-normal-300-900.woff2" crossorigin>
   <link rel="preload" as="font" type="font/woff2" href="assets/fonts/BricolageGrotesque-normal-400-700.woff2" crossorigin>
   <link rel="preload" as="image" href="assets/img/wordmark.webp" type="image/webp">
-  <link rel="stylesheet" href="assets/css/fonts.css?v=20261104">
-  <link rel="stylesheet" href="assets/css/styles.css?v=20261104">
+  <link rel="stylesheet" href="assets/css/fonts.css?v=20261104b">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261104b">
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"Event","name":"MercaBásica 2026","description":"Mercado navideño hecho por el alumnado del CIFP Tony Gallardo, abierto a toda la comunidad.","startDate":"2026-12-11T09:30:00+00:00","endDate":"2026-12-11T13:30:00+00:00","eventStatus":"https://schema.org/EventScheduled","eventAttendanceMode":"https://schema.org/OfflineEventAttendanceMode","location":{"@type":"Place","name":"CIFP Tony Gallardo","telephone":"+34 928 79 62 92","address":{"@type":"PostalAddress","streetAddress":"Ctra. de las Coloradas","postalCode":"35009","addressLocality":"Las Palmas de Gran Canaria","addressRegion":"Las Palmas","addressCountry":"ES"}},"image":"https://myappsserver.duckdns.org/mercabasica/assets/img/og-image.jpg","organizer":{"@type":"EducationalOrganization","name":"CIFP Tony Gallardo","url":"https://www3.gobiernodecanarias.org/medusa/edublog/cifptonygallardo/","email":"secretaria-35015887@gobiernodecanarias.org","telephone":"+34 928 79 62 92"},"url":"https://myappsserver.duckdns.org/mercabasica/"}
   </script>
-  <script src="assets/js/main.js?v=20261104" defer></script>
+  <script src="assets/js/main.js?v=20261104b" defer></script>
 </head>
 <body>
   <a class="skip" href="#contenido">Saltar al contenido</a>
@@ -67,6 +67,7 @@
       <a href="#programa">Programa</a>
       <a href="#recorrido">Recorrido</a>
       <a href="#panateca">Panateca</a>
+      <a href="#media">Media</a>
       <a href="#visita">Cómo llegar</a>
     </nav>
     <p class="beam__count" data-visits hidden><svg viewBox="0 0 24 16" aria-hidden="true"><path d="M1 8s4-6.5 11-6.5S23 8 23 8s-4 6.5-11 6.5S1 8 1 8z"/><circle cx="12" cy="8" r="3.2"/></svg><b data-visits-n>0</b><span>visitas</span></p>
@@ -81,7 +82,7 @@
     <a href="#programa"><small>02</small>Programa</a>
     <a href="#recorrido"><small>03</small>Recorrido</a>
     <a href="#panateca"><small>04</small>Panateca</a>
-    <a href="#carteles"><small>05</small>Carteles</a>
+    <a href="#media"><small>05</small>Media</a>
     <a href="#visita"><small>06</small>Cómo llegar</a>
     <p class="menu__foot">Viernes 11 de diciembre · CIFP Tony Gallardo</p>
   </nav>
@@ -455,19 +456,106 @@
       </div>
     </section>
 
-    <!-- ============ 06 · CARTELES ============ -->
-    <section class="posters" id="carteles">
+    <!-- ============ 05 · MEDIA ============ -->
+    <section class="media" id="media">
       <div class="wrap">
-        <header class="sec-head"><span class="sec-num">05</span><span>Cartelería</span><span class="sec-rule"></span><span class="sec-aside">Toca para ampliar</span></header>
-        <h2 class="posters__title">Dos carteles, <em>un mismo mercado.</em></h2>
-        <ul class="posters__wall">
-          <li><button type="button" data-poster="assets/img/cartel-1.webp" aria-label="Ampliar cartel con acebo y lazo"><img src="assets/img/cartel-1.webp" width="820" height="1160" alt="Cartel MercaBásica 2026 con acebo, lazo rojo y logo del CIFP Tony Gallardo" loading="lazy"></button><span class="tape" aria-hidden="true"></span></li>
-          <li><button type="button" data-poster="assets/img/cartel-2.webp" aria-label="Ampliar cartel de rayas amarillas"><img src="assets/img/cartel-2.webp" width="820" height="1160" alt="Cartel MercaBásica 2026 sobre rayas amarillas" loading="lazy"></button><span class="tape" aria-hidden="true"></span></li>
-        </ul>
+        <header class="sec-head"><span class="sec-num">05</span><span>Media</span><span class="sec-rule"></span><span class="sec-aside">Toca para ampliar</span></header>
+        <h2 class="media__title">El mercado, <em>en imágenes.</em></h2>
+        <p class="media__lead">Los carteles de esta edición y las fotos y vídeos de las anteriores: así ha ido creciendo MercaBásica.</p>
+
+        <div class="media__tabs" role="tablist" aria-label="Ediciones" data-media-tabs hidden>
+          <button type="button" role="tab" id="tab-2026" aria-controls="media-2026" aria-selected="true"><b>2026</b><span>Carteles</span></button>
+          <button type="button" role="tab" id="tab-2025" aria-controls="media-2025" aria-selected="false" tabindex="-1"><b>2025</b><span>Vídeo y 28 fotos</span></button>
+          <button type="button" role="tab" id="tab-2024" aria-controls="media-2024" aria-selected="false" tabindex="-1"><b>2024</b><span>Vídeo y 8 fotos</span></button>
+        </div>
+
+        <div class="media__panel" id="media-2026" role="tabpanel" aria-labelledby="tab-2026" tabindex="0">
+          <h3 class="media__h">Edición 2026 · <em>los carteles</em></h3>
+          <ul class="media__grid media__grid--posters" data-gallery>
+            <li><button type="button" data-media="assets/media/2026/cartel-acebo.webp" data-cap="Cartel de MercaBásica 2026 con acebo y lazo rojo sobre rayas amarillas"><img src="assets/media/2026/cartel-acebo-t.webp" width="396" height="560" alt="Cartel de MercaBásica 2026 con acebo y lazo rojo sobre rayas amarillas" loading="lazy" decoding="async"></button></li>
+            <li><button type="button" data-media="assets/media/2026/cartel-panateca.webp" data-cap="Cartel de MercaBásica 2026 con el logo de Panateca"><img src="assets/media/2026/cartel-panateca-t.webp" width="396" height="560" alt="Cartel de MercaBásica 2026 con el logo de Panateca" loading="lazy" decoding="async"></button></li>
+            <li class="is-wide"><button type="button" data-media="assets/media/2026/invitacion.webp" data-cap="Invitación a MercaBásica 2026: «Cuando las oportunidades se convierten en realidad»"><img src="assets/media/2026/invitacion-t.webp" width="720" height="509" alt="Invitación a MercaBásica 2026: «Cuando las oportunidades se convierten en realidad»" loading="lazy" decoding="async"></button></li>
+          </ul>
+        </div>
+
+        <div class="media__panel" id="media-2025" role="tabpanel" aria-labelledby="tab-2025" tabindex="0">
+          <h3 class="media__h">Edición 2025 · <em>todo el centro en marcha</em></h3>
+          <figure class="media__video">
+            <video controls preload="none" playsinline poster="assets/media/2025/video-2025-poster.webp" width="1280" height="720">
+              <source src="assets/media/2025/video-2025.mp4" type="video/mp4">
+              Tu navegador no puede reproducir este vídeo. <a href="assets/media/2025/video-2025.mp4">Descárgalo aquí</a>.
+            </video>
+            <figcaption>MercaBásica 2025 en vídeo · 2 min 15 s</figcaption>
+          </figure>
+          <ul class="media__grid" data-gallery>
+            <li><button type="button" data-media="assets/media/2025/foto-01.webp" data-cap="Entrevista ante las cámaras de televisión en el centro"><img src="assets/media/2025/foto-01-t.webp" width="640" height="427" alt="Entrevista ante las cámaras de televisión en el centro" loading="lazy" decoding="async"></button></li>
+            <li><button type="button" data-media="assets/media/2025/foto-02.webp" data-cap="Atención a la prensa en el vestíbulo del centro"><img src="assets/media/2025/foto-02-t.webp" width="640" height="427" alt="Atención a la prensa en el vestíbulo del centro" loading="lazy" decoding="async"></button></li>
+            <li><button type="button" data-media="assets/media/2025/foto-03.webp" data-cap="Placa descubierta en la pared de madera del centro"><img src="assets/media/2025/foto-03-t.webp" width="640" height="427" alt="Placa descubierta en la pared de madera del centro" loading="lazy" decoding="async"></button></li>
+            <li><button type="button" data-media="assets/media/2025/foto-04.webp" data-cap="Descubrimiento de la placa con autoridades y profesorado"><img src="assets/media/2025/foto-04-t.webp" width="640" height="427" alt="Descubrimiento de la placa con autoridades y profesorado" loading="lazy" decoding="async"></button></li>
+            <li><button type="button" data-media="assets/media/2025/foto-05.webp" data-cap="Autoridades y profesorado junto a la placa"><img src="assets/media/2025/foto-05-t.webp" width="640" height="427" alt="Autoridades y profesorado junto a la placa" loading="lazy" decoding="async"></button></li>
+            <li><button type="button" data-media="assets/media/2025/foto-06.webp" data-cap="Autoridades en primera fila durante el acto"><img src="assets/media/2025/foto-06-t.webp" width="640" height="426" alt="Autoridades en primera fila durante el acto" loading="lazy" decoding="async"></button></li>
+            <li><button type="button" data-media="assets/media/2025/foto-07.webp" data-cap="Actuación musical en el escenario ante el público"><img src="assets/media/2025/foto-07-t.webp" width="640" height="427" alt="Actuación musical en el escenario ante el público" loading="lazy" decoding="async"></button></li>
+            <li><button type="button" data-media="assets/media/2025/foto-08.webp" data-cap="Una profesora se dirige al público con el micrófono"><img src="assets/media/2025/foto-08-t.webp" width="640" height="427" alt="Una profesora se dirige al público con el micrófono" loading="lazy" decoding="async"></button></li>
+            <li><button type="button" data-media="assets/media/2025/foto-09.webp" data-cap="Patio lleno de público durante el acto"><img src="assets/media/2025/foto-09-t.webp" width="640" height="427" alt="Patio lleno de público durante el acto" loading="lazy" decoding="async"></button></li>
+            <li><button type="button" data-media="assets/media/2025/foto-10.webp" data-cap="Intervención desde el atril de madera"><img src="assets/media/2025/foto-10-t.webp" width="640" height="427" alt="Intervención desde el atril de madera" loading="lazy" decoding="async"></button></li>
+            <li><button type="button" data-media="assets/media/2025/foto-11.webp" data-cap="Intervención institucional desde el atril"><img src="assets/media/2025/foto-11-t.webp" width="640" height="427" alt="Intervención institucional desde el atril" loading="lazy" decoding="async"></button></li>
+            <li><button type="button" data-media="assets/media/2025/foto-12.webp" data-cap="Presentación del acto junto al atril"><img src="assets/media/2025/foto-12-t.webp" width="640" height="427" alt="Presentación del acto junto al atril" loading="lazy" decoding="async"></button></li>
+            <li><button type="button" data-media="assets/media/2025/foto-13.webp" data-cap="Dos docentes posan sonrientes durante la jornada"><img src="assets/media/2025/foto-13-t.webp" width="640" height="427" alt="Dos docentes posan sonrientes durante la jornada" loading="lazy" decoding="async"></button></li>
+            <li><button type="button" data-media="assets/media/2025/foto-14.webp" data-cap="Alumnado junto al atril durante el acto"><img src="assets/media/2025/foto-14-t.webp" width="640" height="427" alt="Alumnado junto al atril durante el acto" loading="lazy" decoding="async"></button></li>
+            <li><button type="button" data-media="assets/media/2025/foto-15.webp" data-cap="Actuación con guitarras ante el público infantil"><img src="assets/media/2025/foto-15-t.webp" width="640" height="427" alt="Actuación con guitarras ante el público infantil" loading="lazy" decoding="async"></button></li>
+            <li><button type="button" data-media="assets/media/2025/foto-16.webp" data-cap="Alumnado con camisetas turquesa cantando en grupo"><img src="assets/media/2025/foto-16-t.webp" width="640" height="427" alt="Alumnado con camisetas turquesa cantando en grupo" loading="lazy" decoding="async"></button></li>
+            <li><button type="button" data-media="assets/media/2025/foto-17.webp" data-cap="Vista general del patio con alumnado y público"><img src="assets/media/2025/foto-17-t.webp" width="640" height="427" alt="Vista general del patio con alumnado y público" loading="lazy" decoding="async"></button></li>
+            <li><button type="button" data-media="assets/media/2025/foto-18.webp" data-cap="Homenaje proyectado en la pantalla del escenario"><img src="assets/media/2025/foto-18-t.webp" width="640" height="427" alt="Homenaje proyectado en la pantalla del escenario" loading="lazy" decoding="async"></button></li>
+            <li><button type="button" data-media="assets/media/2025/foto-19.webp" data-cap="Puesto de carpintería con árboles de Navidad de madera"><img src="assets/media/2025/foto-19-t.webp" width="640" height="427" alt="Puesto de carpintería con árboles de Navidad de madera" loading="lazy" decoding="async"></button></li>
+            <li><button type="button" data-media="assets/media/2025/foto-20.webp" data-cap="Taller de maquillaje atendido por el alumnado"><img src="assets/media/2025/foto-20-t.webp" width="640" height="427" alt="Taller de maquillaje atendido por el alumnado" loading="lazy" decoding="async"></button></li>
+            <li><button type="button" data-media="assets/media/2025/foto-21.webp" data-cap="Una alumna maquilla a otra en el taller"><img src="assets/media/2025/foto-21-t.webp" width="640" height="427" alt="Una alumna maquilla a otra en el taller" loading="lazy" decoding="async"></button></li>
+            <li><button type="button" data-media="assets/media/2025/foto-22.webp" data-cap="Photocall navideño del Ratoncito Pérez"><img src="assets/media/2025/foto-22-t.webp" width="640" height="427" alt="Photocall navideño del Ratoncito Pérez" loading="lazy" decoding="async"></button></li>
+            <li><button type="button" data-media="assets/media/2025/foto-23.webp" data-cap="Pizarra decorada con el dibujo «MercaBank»"><img src="assets/media/2025/foto-23-t.webp" width="640" height="427" alt="Pizarra decorada con el dibujo «MercaBank»" loading="lazy" decoding="async"></button></li>
+            <li><button type="button" data-media="assets/media/2025/foto-24.webp" data-cap="Programa de radio en directo de la Cadena SER desde el centro"><img src="assets/media/2025/foto-24-t.webp" width="640" height="426" alt="Programa de radio en directo de la Cadena SER desde el centro" loading="lazy" decoding="async"></button></li>
+            <li><button type="button" data-media="assets/media/2025/foto-25.webp" data-cap="Entrevista radiofónica con alumnado en la mesa de la SER"><img src="assets/media/2025/foto-25-t.webp" width="640" height="427" alt="Entrevista radiofónica con alumnado en la mesa de la SER" loading="lazy" decoding="async"></button></li>
+            <li><button type="button" data-media="assets/media/2025/foto-26.webp" data-cap="Baile del alumnado en el escenario"><img src="assets/media/2025/foto-26-t.webp" width="640" height="427" alt="Baile del alumnado en el escenario" loading="lazy" decoding="async"></button></li>
+            <li><button type="button" data-media="assets/media/2025/foto-27.webp" data-cap="Foto de grupo de profesorado y participantes"><img src="assets/media/2025/foto-27-t.webp" width="640" height="427" alt="Foto de grupo de profesorado y participantes" loading="lazy" decoding="async"></button></li>
+            <li><button type="button" data-media="assets/media/2025/foto-28.webp" data-cap="Foto de grupo final en el escenario"><img src="assets/media/2025/foto-28-t.webp" width="640" height="427" alt="Foto de grupo final en el escenario" loading="lazy" decoding="async"></button></li>
+          </ul>
+        </div>
+
+        <div class="media__panel" id="media-2024" role="tabpanel" aria-labelledby="tab-2024" tabindex="0">
+          <h3 class="media__h">Edición 2024 · <em>donde empezó todo</em></h3>
+          <figure class="media__video media__video--small">
+            <video controls preload="none" playsinline poster="assets/media/2024/video-2024-poster.webp" width="848" height="480">
+              <source src="assets/media/2024/video-2024.mp4" type="video/mp4">
+              Tu navegador no puede reproducir este vídeo. <a href="assets/media/2024/video-2024.mp4">Descárgalo aquí</a>.
+            </video>
+            <figcaption>Reportaje de Televisión Canaria sobre la primera edición · 37 s</figcaption>
+          </figure>
+          <ul class="media__grid" data-gallery>
+            <li><button type="button" data-media="assets/media/2024/foto-01.webp" data-cap="Puesto de repostería con dulces y limonada bajo un toldo de rayas"><img src="assets/media/2024/foto-01-t.webp" width="640" height="426" alt="Puesto de repostería con dulces y limonada bajo un toldo de rayas" loading="lazy" decoding="async"></button></li>
+            <li><button type="button" data-media="assets/media/2024/foto-02.webp" data-cap="Público y alumnado durante la presentación"><img src="assets/media/2024/foto-02-t.webp" width="640" height="426" alt="Público y alumnado durante la presentación" loading="lazy" decoding="async"></button></li>
+            <li><button type="button" data-media="assets/media/2024/foto-03.webp" data-cap="Lazo rojo de inauguración en un puesto"><img src="assets/media/2024/foto-03-t.webp" width="426" height="640" alt="Lazo rojo de inauguración en un puesto" loading="lazy" decoding="async"></button></li>
+            <li><button type="button" data-media="assets/media/2024/foto-04.webp" data-cap="Corte de la cinta de inauguración de un puesto con flores de Pascua"><img src="assets/media/2024/foto-04-t.webp" width="640" height="426" alt="Corte de la cinta de inauguración de un puesto con flores de Pascua" loading="lazy" decoding="async"></button></li>
+            <li><button type="button" data-media="assets/media/2024/foto-05.webp" data-cap="Visita de autoridades a un panel de trabajos del alumnado"><img src="assets/media/2024/foto-05-t.webp" width="640" height="426" alt="Visita de autoridades a un panel de trabajos del alumnado" loading="lazy" decoding="async"></button></li>
+            <li><button type="button" data-media="assets/media/2024/foto-06.webp" data-cap="Autoridades y profesorado junto a un puesto"><img src="assets/media/2024/foto-06-t.webp" width="640" height="426" alt="Autoridades y profesorado junto a un puesto" loading="lazy" decoding="async"></button></li>
+            <li><button type="button" data-media="assets/media/2024/foto-07.webp" data-cap="Alumnado con diademas navideñas atendiendo un puesto"><img src="assets/media/2024/foto-07-t.webp" width="640" height="427" alt="Alumnado con diademas navideñas atendiendo un puesto" loading="lazy" decoding="async"></button></li>
+            <li><button type="button" data-media="assets/media/2024/foto-08.webp" data-cap="Un alumno muestra un árbol decorado en su puesto"><img src="assets/media/2024/foto-08-t.webp" width="480" height="640" alt="Un alumno muestra un árbol decorado en su puesto" loading="lazy" decoding="async"></button></li>
+          </ul>
+          <h3 class="media__h media__h--small">Imagen de ediciones anteriores</h3>
+          <ul class="media__grid media__grid--brand" data-gallery>
+            <li><button type="button" data-media="assets/media/identidad/puesto-solidario.webp" data-cap="Ilustración de un puesto azul con el lema «MercaBásica Solidario» y el logo del CIFP Tony Gallardo"><img src="assets/media/identidad/puesto-solidario-t.webp" width="560" height="560" alt="Ilustración de un puesto azul con el lema «MercaBásica Solidario» y el logo del CIFP Tony Gallardo" loading="lazy" decoding="async"></button></li>
+            <li><button type="button" data-media="assets/media/identidad/logo-circular.webp" data-cap="Logotipo circular de MercaBásica con la escultura de la mano del CIFP Tony Gallardo"><img src="assets/media/identidad/logo-circular-t.webp" width="560" height="560" alt="Logotipo circular de MercaBásica con la escultura de la mano del CIFP Tony Gallardo" loading="lazy" decoding="async"></button></li>
+          </ul>
+        </div>
       </div>
-      <dialog class="lightbox" data-lightbox aria-label="Cartel ampliado">
-        <img src="" alt="" data-lightbox-img>
-        <button type="button" class="lightbox__close" data-lightbox-close>Cerrar</button>
+      <dialog class="lightbox" data-lightbox aria-label="Imagen ampliada">
+        <figure class="lightbox__fig">
+          <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="" data-lightbox-img>
+          <figcaption data-lightbox-cap></figcaption>
+        </figure>
+        <div class="lightbox__bar">
+          <button type="button" class="lightbox__btn" data-lightbox-prev aria-label="Imagen anterior">←</button>
+          <span class="lightbox__count" data-lightbox-count></span>
+          <button type="button" class="lightbox__btn" data-lightbox-next aria-label="Imagen siguiente">→</button>
+          <button type="button" class="lightbox__close" data-lightbox-close>Cerrar</button>
+        </div>
       </dialog>
     </section>
 
