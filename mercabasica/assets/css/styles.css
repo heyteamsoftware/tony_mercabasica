@@ -551,7 +551,7 @@ p { text-wrap: pretty; }
 .posters { padding: clamp(100px, 12vw, 160px) 0; background: radial-gradient(circle at 1px 1px, rgba(10, 33, 80, .17) 1.3px, transparent 1.7px) 0 0 / 22px 22px, var(--paper-2); }
 .posters__title { margin: 1.8rem 0 0; font-family: var(--f-serif); font-weight: 400; font-size: var(--step-3); line-height: 1; letter-spacing: -.025em; }
 .posters__title em { color: var(--tomato); font-variation-settings: "SOFT" 100, "WONK" 1; }
-.posters__wall { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(18px, 3vw, 46px); margin: clamp(40px, 5vw, 70px) 0 0; padding: 0; list-style: none; }
+.posters__wall { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 760px; gap: clamp(18px, 3vw, 46px); margin: clamp(40px, 5vw, 70px) 0 0; padding: 0; list-style: none; }
 .posters__wall li { position: relative; rotate: -2deg; transition: rotate .45s var(--ease), translate .45s var(--ease); }
 .posters__wall li:nth-child(even) { rotate: 1.8deg; translate: 0 22px; }
 .posters__wall li:nth-child(3) { rotate: -1deg; }
