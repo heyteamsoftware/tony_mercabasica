@@ -1134,3 +1134,61 @@ p { text-wrap: pretty; }
 @media (prefers-reduced-motion: reduce) { .ped__live i, .pcard--ghost { animation: none; } }
 .ped__bar > * { white-space: nowrap; }
 @media (max-width: 440px) { .ped__bar { font-size: .68rem; padding: .8rem 1rem; } .ped__bar > span:last-child { display: none; } }
+
+/* Sello de correos de la portada: «Pedidos abiertos» */
+.hero__foot { flex-wrap: wrap; }
+.stampy {
+  position: relative; flex: none; display: block; width: 152px; margin: 0 .4rem 0 .2rem;
+  color: var(--navy); text-decoration: none; rotate: -5deg;
+  filter: drop-shadow(0 14px 14px rgba(10, 33, 80, .22));
+  transition: rotate .35s var(--ease-out), scale .35s var(--ease-out);
+  animation: stampin .7s 2.7s cubic-bezier(.2, 1.5, .4, 1) both;
+}
+.stampy:hover, .stampy:focus-visible { rotate: -1deg; scale: 1.05; }
+.stampy:focus-visible { outline: 2px dashed var(--navy); outline-offset: 10px; }
+@keyframes stampin { from { opacity: 0; transform: scale(1.7) rotate(-12deg); } 70% { opacity: 1; transform: scale(.94); } to { opacity: 1; transform: none; } }
+.stampy__paper {
+  display: block; padding: 9px; background: #FFFBF3;
+  -webkit-mask: linear-gradient(#000 0 0) center / calc(100% - 12px) calc(100% - 12px) no-repeat, radial-gradient(circle 4.6px, transparent 96%, #000) -6px -6px / 12px 12px;
+  mask: linear-gradient(#000 0 0) center / calc(100% - 12px) calc(100% - 12px) no-repeat, radial-gradient(circle 4.6px, transparent 96%, #000) -6px -6px / 12px 12px;
+}
+.stampy__frame {
+  display: flex; flex-direction: column; align-items: center; gap: .15rem; padding: .7rem .5rem .6rem;
+  border: 1.5px solid rgba(255, 251, 243, .6); outline: 3px solid var(--tomato-d);
+  background: var(--tomato-d) var(--stripes-tomato) 0 0 / 90px 180px; background-color: #B4443C;
+  color: #FFFBF3; text-align: center;
+}
+.stampy__top { font-family: var(--f-mono); font-size: .56rem; letter-spacing: .16em; text-transform: uppercase; }
+.stampy__art { width: 78px; height: auto; margin: .2rem 0 .1rem; }
+.stampy__big { font-family: var(--f-serif); font-weight: 800; font-size: 1.55rem; line-height: .92; letter-spacing: -.02em; font-variation-settings: "SOFT" 100, "WONK" 1; }
+.stampy__val { display: grid; gap: .05rem; margin-top: .35rem; padding-top: .35rem; border-top: 1px dashed rgba(255, 251, 243, .55); width: 100%; }
+.stampy__val b { font-family: var(--f-mono); font-size: .66rem; font-weight: 500; letter-spacing: .2em; }
+.stampy__val span { font-family: var(--f-hand); font-size: .98rem; line-height: 1; color: var(--butter); }
+.stampy__mark {
+  position: absolute; right: -52px; top: -50px; width: 104px; height: 104px; overflow: visible; pointer-events: none;
+  color: rgba(10, 33, 80, .78); rotate: 14deg; mix-blend-mode: multiply;
+  animation: fade .3s 3.25s both;
+}
+.stampy__mark text { font-family: var(--f-mono); }
+.stampy__note { position: absolute; left: 50%; bottom: -2.3rem; translate: -50% 0; width: max-content; font-size: 1.35rem; rotate: 4deg; animation: fade .5s 3.5s both; }
+@media (max-width: 1180px) and (min-width: 901px) {
+  .stampy { width: 136px; }
+  .stampy__big { font-size: 1.35rem; }
+}
+@media (max-width: 560px) {
+  .hero__copy { flex-basis: 100%; }
+  .hero__foot { align-items: flex-start; gap: 1.6rem 2.2rem; padding-bottom: 1.6rem; }
+  .stampy { width: 140px; }
+  .stampy__mark { width: 88px; height: 88px; right: -30px; top: -26px; }
+}
+@media (prefers-reduced-motion: reduce) { .stampy, .stampy__mark, .stampy__note { animation: none; } }
+@media (min-width: 901px) {
+  .hero__foot { flex-wrap: nowrap; gap: clamp(1.2rem, 3vw, 3.2rem); }
+  .hero__copy { flex: 1 1 auto; min-width: 0; }
+}
+@media (min-width: 901px) and (max-width: 1100px) {
+  .stampy { width: 124px; }
+  .stampy__big { font-size: 1.2rem; }
+  .stampy__art { width: 64px; }
+  .stampy__mark { width: 86px; height: 86px; right: -28px; top: -28px; }
+}
