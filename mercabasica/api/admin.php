@@ -2,82 +2,17 @@
 // Panel privado de inscripciones de MercaBásica 2026.
 // La contraseña solo existe en el servidor, cifrada con Argon2id en data/admin.hash.
 declare(strict_types=1);
-require __DIR__ . '/inc.php';
+require __DIR__ . '/auth.php';
 
-header('Content-Type: text/html; charset=utf-8');
-header('Cache-Control: no-store');
-header('X-Robots-Tag: noindex, nofollow');
-header("Content-Security-Policy: default-src 'none'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; form-action 'self'; frame-ancestors 'none'; base-uri 'none'");
-
-const IDLE = 4 * 3600;
-ensure_data_dir();
-purge_if_expired();
-
-$sessDir = DATA_DIR . '/sess';
-if (!is_dir($sessDir)) mkdir($sessDir, 0770, true);
-session_save_path($sessDir);
-session_name('MB26ADM');
-ini_set('session.gc_maxlifetime', (string)IDLE);
-ini_set('session.gc_probability', '1');
-ini_set('session.gc_divisor', '50');
-ini_set('session.use_strict_mode', '1');
-session_set_cookie_params(['lifetime' => 0, 'path' => '/mercabasica/api/', 'secure' => true, 'httponly' => true, 'samesite' => 'Strict']);
-session_start();
-
-$e = fn($s) => htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8');
 $self = 'admin.php';
-function go(string $to): never { header('Location: ' . $to, true, 303); exit; }
-
-// --- Sesión caducada
-if (!empty($_SESSION['ok']) && time() - (int)($_SESSION['t'] ?? 0) > IDLE) { $_SESSION = []; session_regenerate_id(true); }
-$logged = !empty($_SESSION['ok']);
-if ($logged) $_SESSION['t'] = time();
+admin_gate($self);
+$e = fn($s) => h($s);
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
-$loginError = '';
-
-// --- Entrar
-if (!$logged && $method === 'POST' && isset($_POST['clave'])) {
-    $hashFile = DATA_DIR . '/admin.hash';
-    if (!rate_ok('rll', 900, 8, 200)) {
-        $loginError = 'Demasiados intentos. Espera unos minutos.';
-    } elseif (is_file($hashFile) && password_verify((string)$_POST['clave'], trim((string)file_get_contents($hashFile)))) {
-        session_regenerate_id(true);
-        $_SESSION = ['ok' => 1, 't' => time(), 'csrf' => bin2hex(random_bytes(16))];
-        go($self);
-    } else {
-        usleep(600000);
-        $loginError = 'Contraseña incorrecta.';
-    }
-}
-
-if (!$logged) { ?>
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex, nofollow">
-<title>Acceso · Inscripciones MercaBásica 2026</title><link rel="stylesheet" href="../assets/css/fonts.css">
-<style>
-  body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 24px; background: #FBF6EC; color: #0A2150; font: 16px/1.5 "Bricolage Grotesque", system-ui, sans-serif; }
-  form { width: min(380px, 100%); padding: 32px 28px; background: #FFFEFA; border: 2px solid #0A2150; border-radius: 18px; box-shadow: 6px 6px 0 #0A2150; }
-  h1 { margin: 0 0 .2rem; font: 700 2rem/1.05 Fraunces, Georgia, serif; }
-  p { margin: 0 0 1.4rem; opacity: .75; }
-  label { display: block; font: 500 .72rem/1 "DM Mono", monospace; letter-spacing: .12em; text-transform: uppercase; margin-bottom: .5rem; }
-  input { width: 100%; box-sizing: border-box; padding: .8rem .9rem; border: 2px solid #0A2150; border-radius: 10px; font: inherit; background: #fff; }
-  button { margin-top: 1.1rem; width: 100%; padding: .85rem; border: 0; border-radius: 999px; background: #0A2150; color: #FFFBF3; font: 500 .8rem/1 "DM Mono", monospace; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; box-shadow: 3px 3px 0 #CC544C; }
-  .err { margin: .9rem 0 0; color: #A63A31; font-weight: 600; opacity: 1; }
-</style></head><body>
-<form method="post" action="<?= $self ?>">
-  <h1>Inscripciones</h1><p>MercaBásica 2026 · acceso del equipo</p>
-  <label for="clave">Contraseña</label>
-  <input id="clave" name="clave" type="password" autocomplete="current-password" required autofocus>
-  <button type="submit">Entrar</button>
-  <?php if ($loginError): ?><p class="err" role="alert"><?= $e($loginError) ?></p><?php endif; ?>
-</form></body></html>
-<?php exit; }
 
 // --- Acciones (siempre con token anti-CSRF)
 if ($method === 'POST') {
-    if (!hash_equals((string)$_SESSION['csrf'], (string)($_POST['csrf'] ?? ''))) { http_response_code(400); exit('Token no válido. Vuelve atrás y recarga.'); }
     $act = (string)($_POST['accion'] ?? '');
     $back = $self . (isset($_POST['q']) && $_POST['q'] !== '' ? '?q=' . rawurlencode((string)$_POST['q']) : '');
-    if ($act === 'salir') { $_SESSION = []; session_destroy(); go($self); }
     if ($act === 'asistio' || $act === 'borrar') {
         $id = (string)($_POST['id'] ?? '');
         update_json(INS_FILE, function (array $list) use ($act, $id) {
@@ -148,6 +83,9 @@ $qs = $e((string)($_GET['q'] ?? ''));
   header.top { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; padding: 12px 24px; background: var(--navy); color: #FFFBF3; }
   header.top h1 { margin: 0; font: 700 1.25rem/1 Fraunces, Georgia, serif; }
   header.top .sp { flex: 1; }
+  header.top .tabs { display: flex; gap: 6px; }
+  header.top .tabs a { border-color: transparent; opacity: .75; }
+  header.top .tabs a[aria-current] { background: #FBE36F; color: #0A2150; opacity: 1; }
   header.top a, header.top button { color: #FFFBF3; font: 500 .72rem/1 "DM Mono", monospace; letter-spacing: .1em; text-transform: uppercase; text-decoration: none; background: none; border: 1px solid rgba(255,251,243,.4); border-radius: 999px; padding: .5rem .8rem; cursor: pointer; }
   main { max-width: 1280px; margin: 0 auto; padding: 24px; }
   .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; }
@@ -189,12 +127,7 @@ $qs = $e((string)($_GET['q'] ?? ''));
     th { position: static; }
   }
 </style></head><body>
-<header class="top">
-  <h1>Inscripciones · MercaBásica 2026</h1><span class="sp"></span>
-  <a href="<?= $self ?>?csv=1">Descargar Excel (CSV)</a>
-  <a href="../" target="_blank" rel="noopener">Ver la web</a>
-  <form method="post" action="<?= $self ?>" class="inline"><input type="hidden" name="csrf" value="<?= $csrf ?>"><input type="hidden" name="accion" value="salir"><button type="submit">Salir</button></form>
-</header>
+<?= admin_top('Inscripciones · MercaBásica 2026', $_SESSION['csrf'], $self, 'ins', '<a href="' . $self . '?csv=1">Descargar Excel (CSV)</a>') ?>
 <main>
 <?php if ($confirm): ?>
   <div class="confirm" role="alert">

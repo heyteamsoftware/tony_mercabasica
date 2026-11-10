@@ -924,6 +924,253 @@
   }
 
   /* ------------------------------------------------------------------
+     Pedidos: catálogo en vivo desde el Google Sheet + hoja de encargo
+     ------------------------------------------------------------------ */
+  const ped = $('[data-ped]');
+  if (ped) initPedidos(ped);
+
+  function initPedidos(root) {
+    const ZN = { PAS: 'Panadería', MAD: 'Madera', FAB: 'Fabricación y montaje', ALM: 'Almacén' };
+    const KEY = 'mb26-encargo';
+    const POLL = 30000;
+    const list = $('[data-ped-products]', root), filtersEl = $('[data-ped-filters]', root), liveEl = $('[data-ped-live]', root);
+    const noticeEl = $('[data-ped-notice]', root), form = $('[data-ped-form]', root), linesEl = $('[data-ped-lines]', root);
+    const emptyEl = $('[data-ped-empty]', root), totalEl = $('[data-ped-total]', root), msg = $('[data-ped-msg]', root);
+    const sendBtn = $('[data-ped-send]', root), done = $('[data-ped-done]', root), bar = $('[data-ped-bar]', root);
+    const eur = (c) => `${(c / 100).toLocaleString('es-ES', { minimumFractionDigits: c % 100 ? 2 : 0, maximumFractionDigits: 2 })} €`;
+    const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+    const nice = (s) => (s === s.toUpperCase() && /[A-ZÁÉÍÓÚÑ]{3}/.test(s) ? s.charAt(0) + s.slice(1).toLowerCase() : s);
+    const t0 = Date.now();
+    let prods = new Map(), filter = 'all', lastOk = 0, sig = '', failing = false;
+    let cart = (() => { try { const c = JSON.parse(store.get(KEY) || '{}'); return c && typeof c === 'object' ? c : {}; } catch { return {}; } })();
+    const save = () => store.set(KEY, JSON.stringify(cart));
+    const desc = (c) => nice(prods.get(c)?.descripcion || c);
+
+    // Mantiene el foco al redibujar (para no perder el sitio con teclado)
+    const withFocus = (fn) => {
+      const a = d.activeElement, k = a && a.dataset ? a.dataset.k : null;
+      fn();
+      if (k) { const el = root.querySelector(`[data-k="${CSS.escape(k)}"]`); if (el) el.focus(); }
+    };
+
+    function stockLabel(p) {
+      if (p.quedan === null) return ['Por encargo', 'free'];
+      if (p.quedan <= 0) return ['Agotado', 'out'];
+      if (p.quedan <= 3) return [`¡Últimas ${p.quedan}!`, 'low'];
+      return [`Quedan ${p.quedan}`, 'ok'];
+    }
+
+    function renderFilters() {
+      const zones = [...new Set([...prods.values()].map((p) => p.zona))];
+      filtersEl.hidden = zones.length < 2;
+      if (filter !== 'all' && !zones.includes(filter)) filter = 'all';
+      filtersEl.innerHTML = [['all', 'Todo'], ...Object.entries(ZN).filter(([z]) => zones.includes(z))]
+        .map(([z, n]) => `<button type="button" class="chip" data-f="${z}" data-k="f-${z}" aria-pressed="${filter === z}">${esc(n)}</button>`).join('');
+    }
+
+    function renderProducts() {
+      const items = [...prods.values()].filter((p) => filter === 'all' || p.zona === filter);
+      list.setAttribute('aria-busy', 'false');
+      if (!items.length) { list.innerHTML = `<li class="ped__nothing">${prods.size ? 'No hay productos en este apartado.' : 'Todavía no hay productos en el catálogo. Vuelve pronto.'}</li>`; return; }
+      withFocus(() => {
+        list.innerHTML = items.map((p) => {
+          const [lab, cls] = stockLabel(p);
+          const inCart = cart[p.codigo]?.q || 0;
+          const full = p.quedan !== null && inCart >= p.quedan;
+          return `<li class="pcard${p.quedan === 0 ? ' is-out' : ''}">
+            <div class="pcard__img">${p.foto ? `<img src="${esc(p.foto)}" alt="${esc(nice(p.descripcion))}" loading="lazy" decoding="async">` : `<span class="pcard__ph" aria-hidden="true">${esc(p.zona)}</span>`}<span class="pcard__zone">${esc(ZN[p.zona] || p.zona)}</span></div>
+            <div class="pcard__body">
+              <p class="pcard__code">${esc(p.codigo)}</p>
+              <h3 class="pcard__desc">${esc(nice(p.descripcion))}</h3>
+              <p class="pcard__meta"><b class="pcard__price">${eur(p.precio)}</b><span class="pcard__stock pcard__stock--${cls}">${lab}</span></p>
+              <div class="pcard__act">${p.quedan === 0
+                ? '<button class="btn pcard__add" type="button" disabled>Agotado</button>'
+                : `<button class="btn btn--solid pcard__add" type="button" data-add="${esc(p.codigo)}" data-k="add-${esc(p.codigo)}"${full ? ' disabled' : ''}>${full ? 'No quedan más' : 'Añadir'}</button>`}
+                ${inCart ? `<span class="pcard__in">${inCart} en tu hoja</span>` : ''}</div>
+            </div></li>`;
+        }).join('');
+      });
+    }
+
+    function renderCart() {
+      const codes = Object.keys(cart).filter((c) => prods.has(c) || !prods.size);
+      let total = 0, units = 0;
+      withFocus(() => {
+        linesEl.innerHTML = codes.map((c) => {
+          const p = prods.get(c), it = cart[c];
+          const price = p ? p.precio : 0;
+          total += price * it.q; units += it.q;
+          const max = p && p.quedan !== null ? p.quedan : 50;
+          return `<li class="line">
+            <div class="line__main"><span class="line__code">${esc(c)}</span><span class="line__desc">${esc(desc(c))}</span></div>
+            <div class="line__qty">
+              <button type="button" data-dec="${esc(c)}" data-k="dec-${esc(c)}" aria-label="Quitar una unidad de ${esc(desc(c))}">−</button>
+              <input type="number" min="1" max="${max}" value="${it.q}" inputmode="numeric" data-qty="${esc(c)}" data-k="qty-${esc(c)}" aria-label="Unidades de ${esc(desc(c))}">
+              <button type="button" data-inc="${esc(c)}" data-k="inc-${esc(c)}" aria-label="Añadir una unidad de ${esc(desc(c))}"${it.q >= max ? ' disabled' : ''}>+</button>
+            </div>
+            <p class="line__price"><span>${eur(price)} / ud.</span><b>${eur(price * it.q)}</b></p>
+            <button type="button" class="line__del" data-del="${esc(c)}" data-k="del-${esc(c)}" aria-label="Quitar ${esc(desc(c))} del encargo">×</button>
+            <input class="line__perso" type="text" maxlength="200" value="${esc(it.p || '')}" data-perso="${esc(c)}" data-k="perso-${esc(c)}" placeholder="Personalización: texto, color, medidas…" aria-label="Personalización de ${esc(desc(c))}">
+          </li>`;
+        }).join('');
+      });
+      emptyEl.hidden = codes.length > 0;
+      totalEl.textContent = eur(total);
+      bar.hidden = !units || !done.hidden;
+      $('[data-ped-bar-n]', bar).textContent = `${units} ${units === 1 ? 'unidad' : 'unidades'}`;
+      $('[data-ped-bar-total]', bar).textContent = eur(total);
+    }
+
+    function notice(text) { noticeEl.textContent = text; noticeEl.hidden = !text; }
+
+    // Ajusta la hoja si el stock ha bajado mientras tanto
+    function clampCart() {
+      const out = [];
+      Object.entries(cart).forEach(([c, it]) => {
+        const p = prods.get(c);
+        if (!p) { delete cart[c]; out.push(`«${c}» ya no está en el catálogo`); return; }
+        if (p.quedan !== null && it.q > p.quedan) {
+          if (p.quedan <= 0) { delete cart[c]; out.push(`«${desc(c)}» se ha agotado`); }
+          else { it.q = p.quedan; out.push(`de «${desc(c)}» solo quedan ${p.quedan}`); }
+        }
+      });
+      if (out.length) { save(); notice(`Atención: ${out.join('; ')}. Hemos ajustado tu hoja.`); }
+    }
+
+    function paintLive() {
+      const span = $('span', liveEl);
+      liveEl.classList.toggle('is-err', failing);
+      if (failing) { span.textContent = lastOk ? 'Sin conexión con el catálogo. Reintentando…' : 'No podemos cargar el catálogo. Reintentando…'; return; }
+      if (!lastOk) return;
+      const s = Math.round((Date.now() - lastOk) / 1000);
+      span.textContent = `Stock en directo · actualizado ${s < 5 ? 'ahora' : `hace ${s < 60 ? `${s} s` : `${Math.round(s / 60)} min`}`}`;
+    }
+
+    async function refresh() {
+      try {
+        const r = await fetch('api/catalogo.php', { cache: 'no-store', headers: { Accept: 'application/json' } });
+        const j = await r.json();
+        if (!j.ok) throw new Error('catálogo');
+        prods = new Map(j.productos.map((p) => [p.codigo, p]));
+        lastOk = Date.now(); failing = false;
+        clampCart();
+        const s = JSON.stringify(j.productos) + JSON.stringify(cart);
+        if (s !== sig) { sig = s; renderFilters(); renderProducts(); renderCart(); }
+      } catch {
+        failing = true;
+        if (!prods.size) list.innerHTML = '<li class="ped__nothing">No podemos cargar el catálogo ahora mismo. Lo seguimos intentando…</li>';
+      }
+      paintLive();
+    }
+
+    function add(c, n = 1) {
+      const p = prods.get(c);
+      if (!p) return;
+      const cur = cart[c]?.q || 0, max = p.quedan === null ? 50 : p.quedan;
+      const q = clamp(cur + n, 0, max);
+      if (q <= 0) delete cart[c]; else cart[c] = { q, p: cart[c]?.p || '' };
+      save(); sig = '';
+      renderProducts(); renderCart();
+    }
+
+    filtersEl.addEventListener('click', (e) => { const b = e.target.closest('[data-f]'); if (!b) return; filter = b.dataset.f; renderFilters(); renderProducts(); });
+    list.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-add]');
+      if (!b) return;
+      add(b.dataset.add);
+      notice('');
+      const btn = root.querySelector(`[data-add="${CSS.escape(b.dataset.add)}"]`);
+      if (btn && !btn.disabled) { btn.textContent = '¡Añadido!'; setTimeout(() => { if (btn.isConnected && !btn.disabled) btn.textContent = 'Añadir'; }, 1100); }
+    });
+    linesEl.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-inc],[data-dec],[data-del]');
+      if (!b) return;
+      if (b.dataset.inc) add(b.dataset.inc, 1);
+      else if (b.dataset.dec) add(b.dataset.dec, -1);
+      else { delete cart[b.dataset.del]; save(); sig = ''; renderProducts(); renderCart(); }
+    });
+    linesEl.addEventListener('change', (e) => {
+      const q = e.target.closest('[data-qty]');
+      if (!q) return;
+      const c = q.dataset.qty, n = parseInt(q.value, 10);
+      add(c, (Number.isFinite(n) ? n : 1) - (cart[c]?.q || 0));
+    });
+    linesEl.addEventListener('input', (e) => {
+      const p = e.target.closest('[data-perso]');
+      if (p && cart[p.dataset.perso]) { cart[p.dataset.perso].p = p.value.slice(0, 200); save(); }
+    });
+
+    const showErr = (errs) => {
+      $$('[data-err]', form).forEach((p) => {
+        const k = p.dataset.err, m = errs[k] || '';
+        p.textContent = m;
+        const input = form.elements[k];
+        if (input && input.setAttribute) input.setAttribute('aria-invalid', m ? 'true' : 'false');
+      });
+      const first = Object.keys(errs).map((k) => form.elements[k]).find((el) => el && el.focus);
+      if (first) first.focus();
+    };
+
+    form.addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      msg.textContent = '';
+      const f = form.elements, e = {};
+      if (f.nombre.value.trim().length < 3) e.nombre = 'Escribe tu nombre y apellidos.';
+      if (!/^\+?[0-9 ]{9,18}$/.test(f.telefono.value.trim())) e.telefono = 'Escribe un teléfono de contacto (solo números).';
+      if (f.email.value.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(f.email.value.trim())) e.email = 'Revisa el correo electrónico.';
+      if (!Object.keys(cart).length) e.lineas = 'Añade al menos un producto del catálogo.';
+      if (!f.acepto.checked) e.acepto = 'Necesitamos tu conformidad para hacer el encargo.';
+      showErr(e);
+      if (Object.keys(e).length) { msg.textContent = 'Revisa los campos marcados.'; return; }
+      sendBtn.disabled = true; sendBtn.classList.add('is-busy');
+      try {
+        const r = await fetch('api/pedir.php', {
+          method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify({
+            nombre: f.nombre.value, telefono: f.telefono.value, email: f.email.value, direccion: f.direccion.value,
+            observaciones: f.observaciones.value, web: f.web.value, acepto: f.acepto.checked ? '1' : '', t: Date.now() - t0,
+            lineas: Object.entries(cart).map(([codigo, it]) => ({ codigo, cantidad: it.q, personalizacion: it.p || '' })),
+          }),
+        });
+        const j = await r.json().catch(() => ({}));
+        if (r.ok && j.ok) {
+          $('[data-ped-name]', done).textContent = (j.nombre || f.nombre.value).split(' ')[0];
+          $('[data-ped-code]', done).textContent = j.codigo;
+          $('[data-ped-sum]', done).textContent = eur(j.total);
+          $('[data-ped-summary]', done).innerHTML = (j.lineas || []).map((l) => `<li><span>${l.cantidad} × ${esc(nice(l.descripcion))}${l.personalizacion ? `<small>${esc(l.personalizacion)}</small>` : ''}</span><b>${eur(l.precio * l.cantidad)}</b></li>`).join('');
+          cart = {}; save(); sig = '';
+          form.hidden = true; done.hidden = false; bar.hidden = true;
+          done.focus();
+          done.scrollIntoView({ block: 'start', behavior: reduced() ? 'auto' : 'smooth' });
+          refresh();
+          return;
+        }
+        if (j.stock) {
+          Object.entries(j.stock).forEach(([c, s]) => { const p = prods.get(c); if (p) p.quedan = s.quedan; else delete cart[c]; });
+          clampCart(); sig = ''; renderProducts(); renderCart();
+        }
+        if (j.errores) showErr(j.errores);
+        msg.textContent = j.mensaje || 'No se ha podido enviar. Inténtalo de nuevo.';
+      } catch {
+        msg.textContent = 'No hay conexión. Revisa internet e inténtalo de nuevo.';
+      } finally {
+        sendBtn.disabled = false; sendBtn.classList.remove('is-busy');
+      }
+    });
+    $('[data-ped-again]', root).addEventListener('click', () => {
+      form.reset(); form.hidden = false; done.hidden = true; notice('');
+      renderProducts(); renderCart();
+      $('#p-nombre', form).focus();
+    });
+
+    renderCart();
+    refresh();
+    setInterval(() => { if (!d.hidden) refresh(); }, POLL);
+    setInterval(paintLive, 5000);
+    d.addEventListener('visibilitychange', () => { if (!d.hidden && Date.now() - lastOk > 8000) refresh(); });
+  }
+
+  /* ------------------------------------------------------------------
      Recolocar al cambiar el tamaño
      ------------------------------------------------------------------ */
   let rt = 0;

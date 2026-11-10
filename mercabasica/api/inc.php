@@ -61,7 +61,8 @@ function config(): array {
 }
 
 function purge_if_expired(): void {
-    if (time() > strtotime(PURGE_AFTER) && is_file(INS_FILE)) @unlink(INS_FILE);
+    if (time() <= strtotime(PURGE_AFTER)) return;
+    foreach ([INS_FILE, DATA_DIR . '/pedidos.json'] as $f) if (is_file($f)) @unlink($f);
 }
 
 function total_personas(array $list): int {
@@ -99,11 +100,11 @@ function clean(string $s, int $max): string {
     return mb_substr($s, 0, $max);
 }
 
-function new_code(array $list): string {
+function new_code(array $list, string $prefix = 'MB26-'): string {
     $alpha = 'ACDEFGHJKMNPQRTUVWXY34679';
     $used = array_column($list, 'codigo');
     do {
-        $c = 'MB26-';
+        $c = $prefix;
         for ($i = 0; $i < 4; $i++) $c .= $alpha[random_int(0, strlen($alpha) - 1)];
     } while (in_array($c, $used, true));
     return $c;
