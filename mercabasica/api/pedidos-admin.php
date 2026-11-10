@@ -6,7 +6,7 @@ require __DIR__ . '/auth.php';
 require __DIR__ . '/catalogo-lib.php';
 
 $self = 'pedidos-admin.php';
-$csrf = admin_gate($self);
+$csrf = admin_gate($self, 'ped');
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 $zona = (string)($_GET['zona'] ?? 'PAS');
 if ($zona !== 'todos' && !isset(ZONAS[$zona])) $zona = 'PAS';

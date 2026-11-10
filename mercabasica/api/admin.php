@@ -5,7 +5,7 @@ declare(strict_types=1);
 require __DIR__ . '/auth.php';
 
 $self = 'admin.php';
-admin_gate($self);
+admin_gate($self, 'ins');
 $e = fn($s) => h($s);
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 
