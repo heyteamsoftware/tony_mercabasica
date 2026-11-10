@@ -843,6 +843,87 @@
   $$('main > section[id]').forEach((s) => sio.observe(s));
 
   /* ------------------------------------------------------------------
+     Inscripción (control de aforo)
+     ------------------------------------------------------------------ */
+  const insc = $('[data-insc]');
+  if (insc) {
+    const form = $('[data-insc-form]', insc), fields = $('[data-insc-fields]', insc), msg = $('[data-insc-msg]', insc);
+    const send = $('[data-insc-send]', insc), done = $('[data-insc-done]', insc), closed = $('[data-insc-closed]', insc);
+    const tipo = $('#f-tipo', form), entidad = $('#f-entidad', form), hint = $('[data-entidad-hint]', form);
+    const ORG = ['institucion', 'centro', 'empresa', 'prensa'];
+    const t0 = Date.now();
+    const needOrg = () => ORG.includes(tipo.value);
+    const syncOrg = () => { entidad.required = needOrg(); hint.textContent = needOrg() ? '*' : '(si vienes en su nombre)'; hint.classList.toggle('is-req', needOrg()); };
+    tipo.addEventListener('change', syncOrg);
+    syncOrg();
+
+    const showErr = (errs) => {
+      $$('[data-err]', form).forEach((p) => {
+        const k = p.dataset.err, m = errs[k] || '';
+        p.textContent = m;
+        const input = form.elements[k];
+        if (input) input.setAttribute('aria-invalid', m ? 'true' : 'false');
+      });
+      const first = Object.keys(errs).map((k) => form.elements[k]).find(Boolean);
+      if (first) first.focus();
+    };
+    const check = () => {
+      const f = form.elements, e = {};
+      if (f.nombre.value.trim().length < 3) e.nombre = 'Escribe tu nombre y apellidos.';
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(f.email.value.trim())) e.email = 'Revisa el correo electrónico.';
+      if (f.telefono.value.trim() && !/^\+?[0-9 ]{9,18}$/.test(f.telefono.value.trim())) e.telefono = 'Revisa el teléfono (solo números).';
+      const n = +f.personas.value;
+      if (!Number.isInteger(n) || n < 1 || n > 20) e.personas = 'De 1 a 20 personas.';
+      if (!f.tipo.value) e.tipo = 'Elige cómo vienes.';
+      if (needOrg() && f.entidad.value.trim().length < 2) e.entidad = 'Indica la institución, centro o empresa.';
+      if (!f.acepto.checked) e.acepto = 'Necesitamos tu permiso para guardar estos datos.';
+      return e;
+    };
+
+    // ¿Sigue abierto?
+    fetch('api/inscribir.php', { headers: { Accept: 'application/json' } })
+      .then((r) => r.json()).then((j) => { if (j && j.abierto === false) { closed.hidden = false; fields.disabled = true; } })
+      .catch(() => { /* si falla, se intentará al enviar */ });
+
+    form.addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      msg.textContent = '';
+      const errs = check();
+      showErr(errs);
+      if (Object.keys(errs).length) { msg.textContent = 'Revisa los campos marcados.'; return; }
+      const f = form.elements;
+      const body = {
+        nombre: f.nombre.value, email: f.email.value, telefono: f.telefono.value, personas: f.personas.value,
+        tipo: f.tipo.value, entidad: f.entidad.value, comentario: f.comentario.value, web: f.web.value,
+        acepto: f.acepto.checked ? '1' : '', t: Date.now() - t0,
+      };
+      send.disabled = true;
+      send.classList.add('is-busy');
+      try {
+        const r = await fetch('api/inscribir.php', { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(body) });
+        const j = await r.json().catch(() => ({}));
+        if (r.ok && j.ok) {
+          $('[data-insc-name]', done).textContent = (j.nombre || f.nombre.value).split(' ')[0];
+          $('[data-insc-code]', done).textContent = j.codigo;
+          $('[data-insc-people]', done).textContent = j.personas;
+          form.hidden = true;
+          done.hidden = false;
+          insc.classList.add('is-done');
+          done.focus();
+          return;
+        }
+        if (j.errores) showErr(j.errores);
+        msg.textContent = j.mensaje || 'No se ha podido enviar. Inténtalo de nuevo.';
+      } catch {
+        msg.textContent = 'No hay conexión. Revisa internet e inténtalo de nuevo.';
+      } finally {
+        send.disabled = false;
+        send.classList.remove('is-busy');
+      }
+    });
+  }
+
+  /* ------------------------------------------------------------------
      Recolocar al cambiar el tamaño
      ------------------------------------------------------------------ */
   let rt = 0;

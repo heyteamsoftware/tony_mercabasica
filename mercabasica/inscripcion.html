@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Inscripción · MercaBásica 2026 · 11 de diciembre</title>
+  <meta name="description" content="Inscríbete en MercaBásica 2026, el mercado navideño del CIFP Tony Gallardo: viernes 11 de diciembre desde las 09:00 h. Instituciones, centros, empresas, familias y visitantes.">
+  <meta name="theme-color" content="#0A2150">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://myappsserver.duckdns.org/mercabasica/inscripcion.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="MercaBásica 2026">
+  <meta property="og:locale" content="es_ES">
+  <meta property="og:title" content="Inscríbete en MercaBásica 2026">
+  <meta property="og:description" content="Viernes 11 de diciembre desde las 09:00 h en el CIFP Tony Gallardo. Reserva tu sitio en un minuto.">
+  <meta property="og:url" content="https://myappsserver.duckdns.org/mercabasica/inscripcion.html">
+  <meta property="og:image" content="https://myappsserver.duckdns.org/mercabasica/assets/img/og-image.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="assets/icons/favicon-32.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+  <link rel="manifest" href="site.webmanifest">
+  <link rel="stylesheet" href="assets/css/fonts.css?v=20261110a">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261110a">
+  <script src="assets/js/main.js?v=20261110a" defer></script>
+</head>
+<body>
+  <a class="skip" href="#contenido">Saltar al contenido</a>
+  <header class="beam">
+    <a class="beam__brand" href="./" aria-label="MercaBásica 26, volver a la portada">
+      <span class="beam__word" aria-hidden="true"></span><span class="beam__yr" aria-hidden="true">26</span>
+    </a>
+    <nav class="beam__nav beam__nav--always" aria-label="Navegación"><a href="./">Volver a la web</a></nav>
+  </header>
+
+  <main id="contenido" class="insc">
+    <div class="wrap insc__grid">
+      <div class="insc__intro">
+        <header class="sec-head"><span class="sec-num">✎</span><span>Inscripción</span><span class="sec-rule"></span></header>
+        <h1 class="insc__title">Resérvate <em>un sitio.</em></h1>
+        <p class="insc__lead">MercaBásica es abierta y gratuita. Si vienes de fuera del centro (instituciones, otros centros educativos, empresas, entidades, familias o visitantes), inscríbete: nos ayuda a controlar el aforo y a recibirte como mereces.</p>
+        <ul class="insc__facts">
+          <li><b>Viernes 11 de diciembre</b><span>Desde las 09:00 h · acto de apertura a las 09:30 h</span></li>
+          <li><b>CIFP Tony Gallardo</b><span>Ctra. de las Coloradas, 35009 Las Palmas de Gran Canaria</span></li>
+          <li><b>Una inscripción por grupo</b><span>Indica cuántas personas venís en total</span></li>
+        </ul>
+        <p class="insc__note">El profesorado y el alumnado del CIFP Tony Gallardo no necesitan inscribirse.</p>
+      </div>
+
+      <div class="insc__ticket" data-insc>
+        <div class="insc__stub" aria-hidden="true"><span>Entrada · MB26</span><span>11·12·26</span></div>
+
+        <form class="insc__form" action="api/inscribir.php" method="post" novalidate data-insc-form>
+          <p class="insc__closed" data-insc-closed hidden>Las inscripciones están cerradas o el aforo está completo. Si tienes dudas, escríbenos a <a href="mailto:secretaria-35015887@gobiernodecanarias.org">secretaria-35015887@gobiernodecanarias.org</a>.</p>
+          <fieldset class="insc__fields" data-insc-fields>
+            <legend class="sr-only">Tus datos</legend>
+            <div class="fld">
+              <label for="f-nombre">Nombre y apellidos <i>*</i></label>
+              <input id="f-nombre" name="nombre" type="text" autocomplete="name" required minlength="3" maxlength="80" aria-describedby="e-nombre">
+              <p class="fld__err" id="e-nombre" data-err="nombre"></p>
+            </div>
+            <div class="fld">
+              <label for="f-email">Correo electrónico <i>*</i></label>
+              <input id="f-email" name="email" type="email" autocomplete="email" inputmode="email" required maxlength="120" aria-describedby="e-email">
+              <p class="fld__err" id="e-email" data-err="email"></p>
+            </div>
+            <div class="fld fld--half">
+              <label for="f-telefono">Teléfono <span>(opcional)</span></label>
+              <input id="f-telefono" name="telefono" type="tel" autocomplete="tel" inputmode="tel" maxlength="20" aria-describedby="e-telefono">
+              <p class="fld__err" id="e-telefono" data-err="telefono"></p>
+            </div>
+            <div class="fld fld--half">
+              <label for="f-personas">¿Cuántas personas venís? <i>*</i></label>
+              <input id="f-personas" name="personas" type="number" min="1" max="20" value="1" required inputmode="numeric" aria-describedby="e-personas">
+              <p class="fld__err" id="e-personas" data-err="personas"></p>
+            </div>
+            <div class="fld">
+              <label for="f-tipo">Vienes como… <i>*</i></label>
+              <select id="f-tipo" name="tipo" required aria-describedby="e-tipo">
+                <option value="">Elige una opción</option>
+                <option value="institucion">Institución o administración</option>
+                <option value="centro">Centro educativo</option>
+                <option value="empresa">Empresa o entidad</option>
+                <option value="familia">Familia del alumnado</option>
+                <option value="prensa">Medio de comunicación</option>
+                <option value="particular">Particular</option>
+              </select>
+              <p class="fld__err" id="e-tipo" data-err="tipo"></p>
+            </div>
+            <div class="fld">
+              <label for="f-entidad">Institución, centro o empresa <span data-entidad-hint>(si vienes en su nombre)</span></label>
+              <input id="f-entidad" name="entidad" type="text" autocomplete="organization" maxlength="120" aria-describedby="e-entidad">
+              <p class="fld__err" id="e-entidad" data-err="entidad"></p>
+            </div>
+            <div class="fld">
+              <label for="f-comentario">¿Algo que debamos saber? <span>(opcional)</span></label>
+              <textarea id="f-comentario" name="comentario" rows="3" maxlength="500" placeholder="Accesibilidad, hora de llegada, cargo…"></textarea>
+            </div>
+            <div class="fld fld--trap" aria-hidden="true">
+              <label for="f-web">No rellenes este campo</label>
+              <input id="f-web" name="web" type="text" tabindex="-1" autocomplete="off">
+            </div>
+            <div class="fld fld--check">
+              <input id="f-acepto" name="acepto" type="checkbox" value="1" required aria-describedby="e-acepto">
+              <label for="f-acepto">Tengo 14 años o más y acepto que el CIFP Tony Gallardo guarde estos datos solo para organizar el aforo de MercaBásica. Se borran antes del 31 de enero de 2027. <a href="politica-privacidad.html#inscripcion">Más información</a></label>
+              <p class="fld__err" id="e-acepto" data-err="acepto"></p>
+            </div>
+            <p class="insc__msg" role="alert" data-insc-msg></p>
+            <button class="btn btn--solid insc__send" type="submit" data-insc-send>Inscribirme <span aria-hidden="true">→</span></button>
+          </fieldset>
+        </form>
+
+        <div class="insc__done" data-insc-done hidden tabindex="-1">
+          <p class="insc__ok">¡Inscripción hecha!</p>
+          <p class="insc__hi">Te esperamos, <b data-insc-name></b>.</p>
+          <dl class="insc__pass">
+            <div><dt>Código</dt><dd data-insc-code>MB26-0000</dd></div>
+            <div><dt>Personas</dt><dd data-insc-people>1</dd></div>
+            <div><dt>Cuándo</dt><dd>Vie 11·12 · 09:00 h</dd></div>
+          </dl>
+          <p class="insc__keep">Guarda este código (una captura de pantalla vale): te lo podemos pedir en la entrada.</p>
+          <div class="insc__after">
+            <button class="btn btn--solid" type="button" data-ics>Apúntalo en tu calendario</button>
+            <a class="btn" href="./">Ver el programa</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="wrap">
+      <div class="foot__bar">
+        <span>MercaBásica 2026 · CIFP Tony Gallardo</span>
+        <nav class="foot__legal" aria-label="Información legal">
+          <a href="politica-privacidad.html">Privacidad</a>
+          <a href="terminos.html">Aviso legal y condiciones</a>
+          <button type="button" class="foot__prefs" data-consent-open>Preferencias de privacidad</button>
+        </nav>
+      </div>
+    </div>
+  </footer>
+
+  <section class="consent" role="dialog" aria-labelledby="consent-t" aria-describedby="consent-d" hidden data-consent>
+    <p class="consent__t" id="consent-t">¿Nos dejas contar tu visita?</p>
+    <p class="consent__d" id="consent-d">Esta web no usa cookies ni publicidad. Si aceptas, sumaremos tu visita a un contador anónimo: sin cookies y sin guardar tu IP. <a href="politica-privacidad.html#estadisticas">Más información sobre el contador</a></p>
+    <div class="consent__btns">
+      <button class="btn" type="button" data-consent-no>Rechazar</button>
+      <button class="btn" type="button" data-consent-yes>Aceptar</button>
+    </div>
+  </section>
+</body>
+</html>
