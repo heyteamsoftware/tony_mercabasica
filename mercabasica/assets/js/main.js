@@ -595,24 +595,29 @@
   /* ------------------------------------------------------------------
      Tique: impresión, código de barras y nota a mano
      ------------------------------------------------------------------ */
-  const barcode = $('[data-barcode]');
-  if (barcode) {
-    const str = barcode.dataset.barcode;
-    let x = 0, rects = '';
+  // Barras de un código de barras decorativo: [[x, ancho], ...] y ancho total
+  function barBars(str) {
     const R = rng([...str].reduce((a, c) => a + c.charCodeAt(0), 0));
-    rects += '<rect x="0" width="2" height="50"/><rect x="3" width="1" height="50"/>'; x = 6;
+    const bars = [[0, 2], [3, 1]];
+    let x = 6;
     [...str].forEach((ch) => {
       const c = ch.charCodeAt(0);
       for (let b = 0; b < 4; b++) {
         const bw = 1 + ((c >> b) & 1) + (R() > 0.7 ? 1 : 0);
-        rects += `<rect x="${x}" width="${bw}" height="50"/>`;
+        bars.push([x, bw]);
         x += bw + 1 + (R() > 0.5 ? 1 : 0);
       }
     });
-    rects += `<rect x="${x}" width="1" height="50"/><rect x="${x + 2}" width="2" height="50"/>`;
-    barcode.setAttribute('viewBox', `0 0 ${x + 4} 50`);
-    barcode.innerHTML = `<g fill="#1D1D24">${rects}</g>`;
+    bars.push([x, 1], [x + 2, 2]);
+    return { bars, w: x + 4 };
   }
+  function drawBarcode(svg, str) {
+    const { bars, w } = barBars(str);
+    svg.setAttribute('viewBox', `0 0 ${w} 50`);
+    svg.innerHTML = `<g fill="#1D1D24">${bars.map(([x, bw]) => `<rect x="${x}" width="${bw}" height="50"/>`).join('')}</g>`;
+  }
+  const barcode = $('[data-barcode]');
+  if (barcode) drawBarcode(barcode, barcode.dataset.barcode);
   const printer = $('[data-printer]');
   const note = $('[data-receipt-note]');
   const star = $('[data-star]');
@@ -1134,12 +1139,12 @@
         });
         const j = await r.json().catch(() => ({}));
         if (r.ok && j.ok) {
-          $('[data-ped-name]', done).textContent = (j.nombre || f.nombre.value).split(' ')[0];
-          $('[data-ped-code]', done).textContent = j.codigo;
-          $('[data-ped-sum]', done).textContent = eur(j.total);
-          $('[data-ped-summary]', done).innerHTML = (j.lineas || []).map((l) => `<li><span>${l.cantidad} × ${esc(nice(l.descripcion))}${l.personalizacion ? `<small>${esc(l.personalizacion)}</small>` : ''}</span><b>${eur(l.precio * l.cantidad)}</b></li>`).join('');
+          const nombre = (j.nombre || f.nombre.value).trim();
+          $('[data-ped-name]', done).textContent = nombre.split(' ')[0];
           cart = {}; save(); sig = '';
           form.hidden = true; done.hidden = false; bar.hidden = true;
+          ticket = ticketData(j, nombre);
+          showTicket(ticket);
           done.focus();
           done.scrollIntoView({ block: 'start', behavior: reduced() ? 'auto' : 'smooth' });
           refresh();
@@ -1157,6 +1162,150 @@
         sendBtn.disabled = false; sendBtn.classList.remove('is-busy');
       }
     });
+    /* --- Tique del encargo: mismo aspecto que «El tique del día» --- */
+    const receiptEl = $('[data-ped-receipt]', root), printerEl = $('[data-ped-printer]', root);
+    let ticket = null;
+    const two = (n) => String(n).padStart(2, '0');
+    function ticketData(j, nombre) {
+      const n = new Date();
+      return {
+        code: j.codigo, total: j.total, nombre,
+        fecha: `${two(n.getDate())}/${two(n.getMonth() + 1)}/${n.getFullYear()} ${two(n.getHours())}:${two(n.getMinutes())}`,
+        lineas: (j.lineas || []).map((l) => ({ q: l.cantidad, d: nice(l.descripcion), c: l.codigo, u: l.precio, p: l.personalizacion || '' })),
+      };
+    }
+    function showTicket(t) {
+      const units = t.lineas.reduce((a, l) => a + l.q, 0);
+      receiptEl.innerHTML = `
+        <div class="r-head"><span class="r-word" role="img" aria-label="MercaBásica"></span>
+          <p>CIFP TONY GALLARDO<br>LAS PALMAS DE GRAN CANARIA</p>
+          <p class="r-row"><span>ENCARGO ${esc(t.code)}</span><span>${esc(t.fecha)}</span></p></div>
+        <hr class="r-rule r-rule--double">
+        <p class="r-row r-cols r-cols--buy"><span>UDS</span><span>CONCEPTO</span><span>IMPORTE</span></p>
+        <hr class="r-rule">
+        <ol class="r-list">${t.lineas.map((l) => `<li class="r-item r-item--buy"><b>${l.q}×</b><span>${esc(l.d)}<small>${esc(l.c)} · ${eur(l.u)}/ud.</small>${l.p ? `<small>✎ ${esc(l.p)}</small>` : ''}</span><b>${eur(l.u * l.q)}</b></li>`).join('')}</ol>
+        <hr class="r-rule">
+        <p class="r-row"><span>ARTÍCULOS</span><span>${units}</span></p>
+        <p class="r-row"><span>CLIENTE</span><span class="r-ell">${esc(t.nombre.toUpperCase())}</span></p>
+        <p class="r-row"><span>RECOGIDA</span><span>VIE 11/12/2026</span></p>
+        <p class="r-row"><span>ESTADO</span><span>PENDIENTE DE CONFIRMAR</span></p>
+        <hr class="r-rule r-rule--double">
+        <p class="r-row r-total"><span>TOTAL</span><span>${eur(t.total)}</span></p>
+        <p class="r-thanks">¡Gracias por su encargo!<br><span>Recogida en MercaBásica</span></p>
+        <svg class="r-barcode" preserveAspectRatio="none" aria-hidden="true"></svg>
+        <p class="r-code">${esc(t.code.replace('-', ' · '))}</p>`;
+      drawBarcode($('.r-barcode', receiptEl), t.code);
+      printerEl.classList.remove('is-printed');
+      void printerEl.offsetWidth;
+      requestAnimationFrame(() => printerEl.classList.add('is-printed'));
+    }
+
+    // Dibuja el tique en un lienzo (sin librerías) para descargarlo como PNG
+    async function ticketPNG(t) {
+      const S = 3, W = 400, P = 28, IN = 26, ink = '#1D1D24', soft = 'rgba(29,29,36,.6)';
+      await Promise.all(['400 13px "DM Mono"', '500 13px "DM Mono"'].map((f) => d.fonts.load(f).catch(() => null)));
+      const word = await new Promise((ok) => { const im = new Image(); im.onload = () => ok(im); im.onerror = () => ok(null); im.src = 'assets/img/wordmark-mask.webp'; });
+      const c = d.createElement('canvas'), x = c.getContext('2d');
+      const F = (sz, w = 400) => `${w} ${sz}px "DM Mono", ui-monospace, monospace`;
+      const tw = (s, f) => { x.font = f; return x.measureText(s).width; };
+      const wrap = (s, f, max) => {
+        const out = []; let cur = '';
+        s.split(' ').forEach((w) => { const t2 = cur ? `${cur} ${w}` : w; if (tw(t2, f) > max && cur) { out.push(cur); cur = w; } else cur = t2; });
+        if (cur) out.push(cur);
+        return out;
+      };
+      const fit = (s, f, max) => { if (tw(s, f) <= max) return s; while (s.length > 1 && tw(`${s}…`, f) > max) s = s.slice(0, -1); return `${s}…`; };
+      const L = P + IN, R = P + W - IN, CW = R - L, MID = P + W / 2, QW = 40;
+      const ops = [];
+      let y = P + 34;
+      const ww = CW * 0.76, wh = ww * 382 / 1209;
+      ops.push(['word', MID - ww / 2, y, ww, wh]); y += wh + 22;
+      ['CIFP TONY GALLARDO', 'LAS PALMAS DE GRAN CANARIA'].forEach((s) => { ops.push(['t', s, MID, y, F(13), 'center']); y += 19; });
+      y += 12; ops.push(['row', `ENCARGO ${t.code}`, t.fecha, y, F(13)]); y += 14;
+      ops.push(['dbl', y]); y += 22;
+      ops.push(['t', 'UDS', L, y, F(13, 500)], ['t', 'CONCEPTO', L + QW, y, F(13, 500)], ['t', 'IMPORTE', R, y, F(13, 500), 'right']); y += 12;
+      ops.push(['dash', y]); y += 24;
+      t.lineas.forEach((l) => {
+        const amt = eur(l.u * l.q), dw = CW - QW - tw(amt, F(13, 500)) - 14;
+        ops.push(['t', `${l.q}×`, L, y, F(13, 500)], ['t', amt, R, y, F(13, 500), 'right']);
+        wrap(l.d, F(13), dw).forEach((s, i) => ops.push(['t', s, L + QW, y + i * 19, F(13)]));
+        y += wrap(l.d, F(13), dw).length * 19;
+        ops.push(['t', `${l.c} · ${eur(l.u)}/ud.`, L + QW, y, F(11.5), 'left', soft]); y += 17;
+        if (l.p) wrap(`✎ ${l.p}`, F(11.5), dw).forEach((s) => { ops.push(['t', s, L + QW, y, F(11.5), 'left', soft]); y += 17; });
+        y += 9;
+      });
+      ops.push(['dash', y - 8]); y += 18;
+      const units = t.lineas.reduce((a, l) => a + l.q, 0);
+      [['ARTÍCULOS', String(units)], ['CLIENTE', t.nombre.toUpperCase()], ['RECOGIDA', 'VIE 11/12/2026'], ['ESTADO', 'PENDIENTE DE CONFIRMAR']].forEach(([a, b]) => { ops.push(['row', a, b, y, F(13)]); y += 21; });
+      y += 2; ops.push(['dbl', y]); y += 30;
+      ops.push(['row', 'TOTAL', eur(t.total), y, F(17, 500)]); y += 38;
+      ops.push(['t', '¡GRACIAS POR SU ENCARGO!', MID, y, F(13), 'center', ink, 2]); y += 19;
+      ops.push(['t', 'RECOGIDA EN MERCABÁSICA', MID, y, F(12), 'center', soft, 2]); y += 22;
+      ops.push(['bars', y]); y += 54 + 18;
+      ops.push(['t', t.code.replace('-', ' · '), MID, y, F(11.5), 'center', ink, 4]); y += 36;
+      const H = y;
+      c.width = (W + P * 2) * S; c.height = (H + P + 6) * S;
+      x.scale(S, S);
+      x.fillStyle = '#FBF6EC'; x.fillRect(0, 0, W + P * 2, H + P + 6);
+      // papel con borde dentado abajo
+      x.beginPath(); x.moveTo(P, P); x.lineTo(P + W, P); x.lineTo(P + W, H - 10);
+      for (let zx = P + W; zx > P; zx -= 18) { x.lineTo(Math.max(P, zx - 9), H); x.lineTo(Math.max(P, zx - 18), H - 10); }
+      x.closePath();
+      x.save(); x.shadowColor = 'rgba(80,60,10,.18)'; x.shadowBlur = 22; x.shadowOffsetY = 10; x.fillStyle = '#FFFEFA'; x.fill(); x.restore();
+      x.textBaseline = 'alphabetic';
+      ops.forEach((o) => {
+        const [k] = o;
+        if (k === 'word' && word) {
+          const oc = d.createElement('canvas'); oc.width = Math.round(o[3] * S); oc.height = Math.round(o[4] * S);
+          const ox = oc.getContext('2d'); ox.drawImage(word, 0, 0, oc.width, oc.height); ox.globalCompositeOperation = 'source-in'; ox.fillStyle = ink; ox.fillRect(0, 0, oc.width, oc.height);
+          x.drawImage(oc, o[1], o[2], o[3], o[4]);
+        } else if (k === 't') {
+          const [, s, tx, ty, f, al = 'left', col = ink, ls = 0] = o;
+          x.font = f; x.fillStyle = col; x.textAlign = al;
+          if ('letterSpacing' in x) x.letterSpacing = `${ls}px`;
+          x.fillText(s, tx, ty);
+          if ('letterSpacing' in x) x.letterSpacing = '0px';
+        } else if (k === 'row') {
+          const [, a, b, ty, f] = o;
+          x.font = f; x.fillStyle = ink; x.textAlign = 'left'; x.fillText(a, L, ty);
+          x.textAlign = 'right'; x.fillText(fit(b, f, CW - tw(a, f) - 18), R, ty);
+        } else if (k === 'dbl') {
+          x.fillStyle = ink; x.globalAlpha = 0.8; x.fillRect(L, o[1], CW, 1.2); x.fillRect(L, o[1] + 3.2, CW, 1.2); x.globalAlpha = 1;
+        } else if (k === 'dash') {
+          x.save(); x.strokeStyle = ink; x.globalAlpha = 0.7; x.lineWidth = 1.2; x.setLineDash([4, 3]); x.beginPath(); x.moveTo(L, o[1]); x.lineTo(R, o[1]); x.stroke(); x.restore();
+        } else if (k === 'bars') {
+          const { bars, w } = barBars(t.code), bw = CW * 0.78, k2 = bw / w, bx = MID - bw / 2;
+          x.fillStyle = ink; bars.forEach(([bx0, b]) => x.fillRect(bx + bx0 * k2, o[1], b * k2, 54));
+        }
+      });
+      return new Promise((ok) => c.toBlob(ok, 'image/png'));
+    }
+    $('[data-ped-png]', root).addEventListener('click', async (e) => {
+      if (!ticket) return;
+      const btn = e.currentTarget;
+      btn.disabled = true;
+      try {
+        const blob = await ticketPNG(ticket);
+        const a = d.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `MercaBasica2026-${ticket.code}.png`;
+        d.body.append(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+      } finally { btn.disabled = false; }
+    });
+    $('[data-ped-pdf]', root).addEventListener('click', () => {
+      if (!ticket) return;
+      printerEl.classList.add('is-printed');
+      d.body.classList.add('print-ticket');
+      const off = () => { d.body.classList.remove('print-ticket'); removeEventListener('afterprint', off); };
+      addEventListener('afterprint', off);
+      const old = d.title;
+      d.title = `MercaBasica2026-${ticket.code}`;
+      window.print();
+      d.title = old;
+      setTimeout(off, 1000);
+    });
+
     $('[data-ped-again]', root).addEventListener('click', () => {
       form.reset(); form.hidden = false; done.hidden = true; notice('');
       renderProducts(); renderCart();

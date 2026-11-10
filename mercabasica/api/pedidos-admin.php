@@ -41,6 +41,21 @@ if ($method === 'POST') {
         update_json(PED_FILE, fn(array $orders) => [array_values(array_filter($orders, fn($o) => $o['id'] !== $id)), null]);
         go($back);
     }
+    if ($act === 'quitar') {
+        // Quita una línea; si el pedido se queda vacío, se borra entero. Las unidades vuelven al stock.
+        $i = (int)($_POST['linea'] ?? -1);
+        update_json(PED_FILE, function (array $orders) use ($id, $i) {
+            foreach ($orders as $k => &$o) {
+                if ($o['id'] !== $id || !isset($o['lineas'][$i])) continue;
+                array_splice($o['lineas'], $i, 1);
+                if (!$o['lineas']) { unset($orders[$k]); break; }
+                $o['total'] = array_sum(array_map(fn($l) => (int)$l['precio'] * (int)$l['cantidad'], $o['lineas']));
+            }
+            unset($o);
+            return [array_values($orders), null];
+        });
+        go($back);
+    }
     if ($act === 'fotos') { sync_fotos(true); go($back); }
     if ($act === 'sheet') { catalog(true); go($back); }
     go($back);
@@ -82,6 +97,8 @@ foreach ($orders as $o) {
 }
 $confirm = null;
 if (isset($_GET['borrar'])) foreach ($orders as $o) if ($o['id'] === $_GET['borrar']) $confirm = $o;
+$quitar = null;
+if (isset($_GET['quitar'], $_GET['linea'])) foreach ($orders as $o) if ($o['id'] === $_GET['quitar'] && isset($o['lineas'][(int)$_GET['linea']])) $quitar = [$o, (int)$_GET['linea']];
 $ago = function (?int $t): string {
     if (!$t) return 'nunca';
     $s = time() - $t;
@@ -130,6 +147,7 @@ $back = $url();
   .thumb { width: 44px; height: 44px; object-fit: cover; border-radius: 8px; border: 1px solid var(--line); background: #fff; }
   .warn { color: #A63A31; font-weight: 700; }
   .perso { padding: 2px 8px; border-radius: 6px; background: #FCECB4; }
+  .del { display: inline-block; margin-top: 6px; color: #A63A31; font-size: .8rem; }
   .st { display: inline-block; padding: 2px 9px; border-radius: 999px; font: 600 .74rem/1.6 inherit; white-space: nowrap; background: #eee; }
   .st--pendiente { background: #FCECB4; } .st--confirmado { background: #D9E7F6; } .st--listo { background: #DDEFE0; color: #1F4D37; }
   .st--entregado { background: var(--holly); color: #fff; } .st--no_disponible { background: #F6D9D5; color: #8A2C24; }
@@ -154,6 +172,14 @@ $back = $url();
   <div class="confirm" role="alert">
     <p><b>¿Borrar el pedido <?= h($confirm['codigo']) ?> de <?= h($confirm['cliente']['nombre']) ?>?</b> Las unidades vuelven al stock disponible. No se puede deshacer.</p>
     <form method="post" action="<?= $self ?>" class="inline"><input type="hidden" name="csrf" value="<?= h($csrf) ?>"><input type="hidden" name="accion" value="borrar"><input type="hidden" name="id" value="<?= h($confirm['id']) ?>"><input type="hidden" name="volver" value="<?= h($back) ?>"><button class="btn red" type="submit">Sí, borrar</button></form>
+    <a class="btn ghost" href="<?= h($back) ?>">Cancelar</a>
+  </div>
+<?php endif; ?>
+<?php if ($quitar): [$qo, $qi] = $quitar; $ql = $qo['lineas'][$qi]; ?>
+  <div class="confirm" role="alert">
+    <p><b>¿Quitar <?= (int)$ql['cantidad'] ?> × <?= h($ql['descripcion']) ?> del encargo <?= h($qo['codigo']) ?> (<?= h($qo['cliente']['nombre']) ?>)?</b>
+      Las unidades vuelven al stock de la web.<?= count($qo['lineas']) === 1 ? ' Es el único producto del encargo, así que el encargo se borra entero.' : ' El resto del encargo no cambia.' ?> No se puede deshacer.</p>
+    <form method="post" action="<?= $self ?>" class="inline"><input type="hidden" name="csrf" value="<?= h($csrf) ?>"><input type="hidden" name="accion" value="quitar"><input type="hidden" name="id" value="<?= h($qo['id']) ?>"><input type="hidden" name="linea" value="<?= $qi ?>"><input type="hidden" name="volver" value="<?= h($back) ?>"><button class="btn red" type="submit">Sí, quitar</button></form>
     <a class="btn ghost" href="<?= h($back) ?>">Cancelar</a>
   </div>
 <?php endif; ?>
@@ -237,7 +263,8 @@ $back = $url();
           <td><?= $l['personalizacion'] ? '<span class="perso">' . h($l['personalizacion']) . '</span>' : '' ?><?= $o['observaciones'] ? '<small>' . h($o['observaciones']) . '</small>' : '' ?></td>
           <td><form method="post" action="<?= $self ?>" class="inline"><input type="hidden" name="csrf" value="<?= h($csrf) ?>"><input type="hidden" name="accion" value="estado"><input type="hidden" name="id" value="<?= h($o['id']) ?>"><input type="hidden" name="linea" value="<?= $i ?>"><input type="hidden" name="volver" value="<?= h($back) ?>">
             <select name="estado" aria-label="Estado de la línea"><?php foreach (ESTADOS as $k => $v): ?><option value="<?= $k ?>"<?= $l['estado'] === $k ? ' selected' : '' ?>><?= h($v) ?></option><?php endforeach; ?></select>
-            <button class="btn" type="submit">Guardar</button></form></td>
+            <button class="btn" type="submit">Guardar</button></form>
+            <a class="del noprint" href="<?= h($url(['quitar' => $o['id'], 'linea' => $i])) ?>">Quitar del encargo</a></td>
         </tr>
       <?php endforeach; ?>
       </tbody>

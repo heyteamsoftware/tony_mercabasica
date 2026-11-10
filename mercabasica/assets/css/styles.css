@@ -1192,3 +1192,30 @@ p { text-wrap: pretty; }
   .stampy__art { width: 64px; }
   .stampy__mark { width: 86px; height: 86px; right: -28px; top: -28px; }
 }
+
+/* Tique del encargo (mismo papel que «El tique del día») */
+.ped__printer { max-width: 400px; margin: 1.6rem auto 0; text-align: left; }
+.ped__printer .printer__slot { left: -14px; right: -14px; }
+.ped__printer .receipt { font-size: .8rem; padding: 2rem 1.4rem 2.4rem; }
+.r-cols--buy, .r-item--buy { display: grid; grid-template-columns: 2.6em minmax(0, 1fr) auto; gap: .6em; }
+.r-item--buy > b { font-weight: 500; white-space: nowrap; }
+.r-item--buy small { margin-top: .1rem; }
+.r-cols--buy span:last-child { text-align: right; }
+.r-ell { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ped__dl { display: flex; flex-wrap: wrap; justify-content: center; gap: .8rem; margin: 1.4rem 0 1.2rem; }
+
+@media print {
+  body.print-ticket > :not(main), body.print-ticket::after,
+  body.print-ticket .ped__head, body.print-ticket .ped__cat, body.print-ticket .ped__bar, body.print-ticket noscript,
+  body.print-ticket [data-ped-form], body.print-ticket [data-ped-done] > :not(.ped__printer), body.print-ticket .printer__slot { display: none !important; }
+  body.print-ticket { background: #fff; }
+  body.print-ticket .ped { padding: 0; }
+  body.print-ticket .ped__grid { display: block; }
+  body.print-ticket .ped__sheet { position: static; }
+  body.print-ticket .sheet--done { padding: 0; border: 0; box-shadow: none; animation: none; }
+  body.print-ticket .ped__printer { margin: 0 auto; max-width: 92mm; }
+  body.print-ticket .printer__paper { filter: none; padding: 0; overflow: visible; }
+  body.print-ticket .receipt { transform: none !important; transition: none; border: 1px solid #ddd; -webkit-mask: none; mask: none; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body.print-ticket .r-word { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  @page { margin: 12mm; }
+}

@@ -20,9 +20,9 @@
   <link rel="icon" href="assets/icons/favicon-32.png" type="image/png" sizes="32x32">
   <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
   <link rel="manifest" href="site.webmanifest">
-  <link rel="stylesheet" href="assets/css/fonts.css?v=20261110d">
-  <link rel="stylesheet" href="assets/css/styles.css?v=20261110d">
-  <script src="assets/js/main.js?v=20261110d" defer></script>
+  <link rel="stylesheet" href="assets/css/fonts.css?v=20261110e">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261110e">
+  <script src="assets/js/main.js?v=20261110e" defer></script>
 </head>
 <body>
   <a class="skip" href="#contenido">Saltar al contenido</a>
@@ -119,14 +119,16 @@
           <div class="sheet sheet--done" data-ped-done hidden tabindex="-1">
             <p class="insc__ok">¡Encargo recibido!</p>
             <p class="insc__hi">Gracias, <b data-ped-name></b>.</p>
-            <dl class="insc__pass">
-              <div><dt>Encargo</dt><dd data-ped-code>PED-0000</dd></div>
-              <div><dt>Total</dt><dd data-ped-sum>0 €</dd></div>
-              <div><dt>Recogida</dt><dd>Vie 11·12</dd></div>
-            </dl>
-            <ul class="sheet__summary" data-ped-summary></ul>
-            <p class="insc__keep">Guarda este código (una captura vale). El equipo revisará tu encargo y te llamará si hay que concretar algo.</p>
-            <div class="insc__after"><a class="btn btn--solid" href="./">Volver a MercaBásica</a><button class="btn" type="button" data-ped-again>Hacer otro encargo</button></div>
+            <div class="printer ped__printer" data-ped-printer>
+              <div class="printer__slot" aria-hidden="true"><span></span></div>
+              <div class="printer__paper"><div class="receipt" data-ped-receipt></div></div>
+            </div>
+            <div class="ped__dl">
+              <button class="btn btn--solid" type="button" data-ped-png>Descargar tique <span aria-hidden="true">↓</span></button>
+              <button class="btn" type="button" data-ped-pdf>Guardar en PDF</button>
+            </div>
+            <p class="insc__keep">Guarda el tique: te lo podemos pedir al recoger. El equipo revisará tu encargo y te llamará si hay que concretar algo.</p>
+            <div class="insc__after"><a class="btn" href="./">Volver a MercaBásica</a><button class="btn" type="button" data-ped-again>Hacer otro encargo</button></div>
           </div>
         </aside>
       </div>
