@@ -7,6 +7,9 @@ RewriteEngine On
 RewriteCond %{HTTPS} !=on
 RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
 
+# --- La antigua página de pedidos ahora es el catálogo
+RewriteRule ^pedidos\.html$ /mercabasica/catalogo.html [R=301,L]
+
 # --- Página 404 propia y sin listados de carpetas
 ErrorDocument 404 /mercabasica/404.html
 Options -Indexes

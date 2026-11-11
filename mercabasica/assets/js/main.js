@@ -929,117 +929,49 @@
   }
 
   /* ------------------------------------------------------------------
-     Pedidos: catálogo en vivo desde el Google Sheet + hoja de encargo
+     Catálogo: productos en vivo desde el Google Sheet (solo consulta)
      ------------------------------------------------------------------ */
-  const ped = $('[data-ped]');
-  if (ped) initPedidos(ped);
+  const catRoot = $('[data-cat]');
+  if (catRoot) initCatalogo(catRoot);
 
-  function initPedidos(root) {
+  function initCatalogo(root) {
     const ZN = { PAS: 'Panadería', MAD: 'Madera', FAB: 'Fabricación y montaje', ALM: 'Almacén' };
-    const KEY = 'mb26-encargo';
     const POLL = 30000;
-    const list = $('[data-ped-products]', root), filtersEl = $('[data-ped-filters]', root), liveEl = $('[data-ped-live]', root);
-    const noticeEl = $('[data-ped-notice]', root), form = $('[data-ped-form]', root), linesEl = $('[data-ped-lines]', root);
-    const emptyEl = $('[data-ped-empty]', root), totalEl = $('[data-ped-total]', root), msg = $('[data-ped-msg]', root);
-    const sendBtn = $('[data-ped-send]', root), done = $('[data-ped-done]', root), bar = $('[data-ped-bar]', root);
+    const list = $('[data-cat-products]', root), filtersEl = $('[data-cat-filters]', root), liveEl = $('[data-cat-live]', root);
     const eur = (c) => `${(c / 100).toLocaleString('es-ES', { minimumFractionDigits: c % 100 ? 2 : 0, maximumFractionDigits: 2 })} €`;
     const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
     const nice = (s) => (s === s.toUpperCase() && /[A-ZÁÉÍÓÚÑ]{3}/.test(s) ? s.charAt(0) + s.slice(1).toLowerCase() : s);
-    const t0 = Date.now();
-    let prods = new Map(), filter = 'all', lastOk = 0, sig = '', failing = false;
-    let cart = (() => { try { const c = JSON.parse(store.get(KEY) || '{}'); return c && typeof c === 'object' ? c : {}; } catch { return {}; } })();
-    const save = () => store.set(KEY, JSON.stringify(cart));
-    const desc = (c) => nice(prods.get(c)?.descripcion || c);
+    let prods = [], filter = 'all', lastOk = 0, sig = '', failing = false;
 
-    // Mantiene el foco al redibujar (para no perder el sitio con teclado)
-    const withFocus = (fn) => {
-      const a = d.activeElement, k = a && a.dataset ? a.dataset.k : null;
-      fn();
-      if (k) { const el = root.querySelector(`[data-k="${CSS.escape(k)}"]`); if (el) el.focus(); }
-    };
-
-    function stockLabel(p) {
-      if (p.quedan === null) return ['Por encargo', 'free'];
+    const stock = (p) => {
+      if (p.quedan === null) return null;
       if (p.quedan <= 0) return ['Agotado', 'out'];
       if (p.quedan <= 3) return [`¡Últimas ${p.quedan}!`, 'low'];
-      return [`Quedan ${p.quedan}`, 'ok'];
-    }
+      return [`${p.quedan} disponibles`, 'ok'];
+    };
 
     function renderFilters() {
-      const zones = [...new Set([...prods.values()].map((p) => p.zona))];
+      const zones = [...new Set(prods.map((p) => p.zona))];
       filtersEl.hidden = zones.length < 2;
       if (filter !== 'all' && !zones.includes(filter)) filter = 'all';
       filtersEl.innerHTML = [['all', 'Todo'], ...Object.entries(ZN).filter(([z]) => zones.includes(z))]
-        .map(([z, n]) => `<button type="button" class="chip" data-f="${z}" data-k="f-${z}" aria-pressed="${filter === z}">${esc(n)}</button>`).join('');
+        .map(([z, n]) => `<button type="button" class="chip" data-f="${z}" aria-pressed="${filter === z}">${esc(n)}</button>`).join('');
     }
 
     function renderProducts() {
-      const items = [...prods.values()].filter((p) => filter === 'all' || p.zona === filter);
+      const items = prods.filter((p) => filter === 'all' || p.zona === filter);
       list.setAttribute('aria-busy', 'false');
-      if (!items.length) { list.innerHTML = `<li class="ped__nothing">${prods.size ? 'No hay productos en este apartado.' : 'Todavía no hay productos en el catálogo. Vuelve pronto.'}</li>`; return; }
-      withFocus(() => {
-        list.innerHTML = items.map((p) => {
-          const [lab, cls] = stockLabel(p);
-          const inCart = cart[p.codigo]?.q || 0;
-          const full = p.quedan !== null && inCart >= p.quedan;
-          return `<li class="pcard${p.quedan === 0 ? ' is-out' : ''}">
-            <div class="pcard__img">${p.foto ? `<img src="${esc(p.foto)}" alt="${esc(nice(p.descripcion))}" loading="lazy" decoding="async">` : `<span class="pcard__ph" aria-hidden="true">${esc(p.zona)}</span>`}<span class="pcard__zone">${esc(ZN[p.zona] || p.zona)}</span></div>
-            <div class="pcard__body">
-              <p class="pcard__code">${esc(p.codigo)}</p>
-              <h3 class="pcard__desc">${esc(nice(p.descripcion))}</h3>
-              <p class="pcard__meta"><b class="pcard__price">${eur(p.precio)}</b><span class="pcard__stock pcard__stock--${cls}">${lab}</span></p>
-              <div class="pcard__act">${p.quedan === 0
-                ? '<button class="btn pcard__add" type="button" disabled>Agotado</button>'
-                : `<button class="btn btn--solid pcard__add" type="button" data-add="${esc(p.codigo)}" data-k="add-${esc(p.codigo)}"${full ? ' disabled' : ''}>${full ? 'No quedan más' : 'Añadir'}</button>`}
-                ${inCart ? `<span class="pcard__in">${inCart} en tu hoja</span>` : ''}</div>
-            </div></li>`;
-        }).join('');
-      });
-    }
-
-    function renderCart() {
-      const codes = Object.keys(cart).filter((c) => prods.has(c) || !prods.size);
-      let total = 0, units = 0;
-      withFocus(() => {
-        linesEl.innerHTML = codes.map((c) => {
-          const p = prods.get(c), it = cart[c];
-          const price = p ? p.precio : 0;
-          total += price * it.q; units += it.q;
-          const max = p && p.quedan !== null ? p.quedan : 50;
-          return `<li class="line">
-            <div class="line__main"><span class="line__code">${esc(c)}</span><span class="line__desc">${esc(desc(c))}</span></div>
-            <div class="line__qty">
-              <button type="button" data-dec="${esc(c)}" data-k="dec-${esc(c)}" aria-label="Quitar una unidad de ${esc(desc(c))}">−</button>
-              <input type="number" min="1" max="${max}" value="${it.q}" inputmode="numeric" data-qty="${esc(c)}" data-k="qty-${esc(c)}" aria-label="Unidades de ${esc(desc(c))}">
-              <button type="button" data-inc="${esc(c)}" data-k="inc-${esc(c)}" aria-label="Añadir una unidad de ${esc(desc(c))}"${it.q >= max ? ' disabled' : ''}>+</button>
-            </div>
-            <p class="line__price"><span>${eur(price)} / ud.</span><b>${eur(price * it.q)}</b></p>
-            <button type="button" class="line__del" data-del="${esc(c)}" data-k="del-${esc(c)}" aria-label="Quitar ${esc(desc(c))} del encargo">×</button>
-            <input class="line__perso" type="text" maxlength="200" value="${esc(it.p || '')}" data-perso="${esc(c)}" data-k="perso-${esc(c)}" placeholder="Personalización: texto, color, medidas…" aria-label="Personalización de ${esc(desc(c))}">
-          </li>`;
-        }).join('');
-      });
-      emptyEl.hidden = codes.length > 0;
-      totalEl.textContent = eur(total);
-      bar.hidden = !units || !done.hidden;
-      $('[data-ped-bar-n]', bar).textContent = `${units} ${units === 1 ? 'unidad' : 'unidades'}`;
-      $('[data-ped-bar-total]', bar).textContent = eur(total);
-    }
-
-    function notice(text) { noticeEl.textContent = text; noticeEl.hidden = !text; }
-
-    // Ajusta la hoja si el stock ha bajado mientras tanto
-    function clampCart() {
-      const out = [];
-      Object.entries(cart).forEach(([c, it]) => {
-        const p = prods.get(c);
-        if (!p) { delete cart[c]; out.push(`«${c}» ya no está en el catálogo`); return; }
-        if (p.quedan !== null && it.q > p.quedan) {
-          if (p.quedan <= 0) { delete cart[c]; out.push(`«${desc(c)}» se ha agotado`); }
-          else { it.q = p.quedan; out.push(`de «${desc(c)}» solo quedan ${p.quedan}`); }
-        }
-      });
-      if (out.length) { save(); notice(`Atención: ${out.join('; ')}. Hemos ajustado tu hoja.`); }
+      if (!items.length) { list.innerHTML = `<li class="ped__nothing">${prods.length ? 'No hay productos en este apartado.' : 'Todavía no hay productos en el catálogo. Vuelve pronto.'}</li>`; return; }
+      list.innerHTML = items.map((p) => {
+        const st = stock(p);
+        return `<li class="pcard${p.quedan === 0 ? ' is-out' : ''}">
+          <div class="pcard__img">${p.foto ? `<img src="${esc(p.foto)}" alt="${esc(nice(p.descripcion))}" loading="lazy" decoding="async">` : `<span class="pcard__ph" aria-hidden="true">${esc(p.zona)}</span>`}<span class="pcard__zone">${esc(ZN[p.zona] || p.zona)}</span></div>
+          <div class="pcard__body">
+            <p class="pcard__code">${esc(p.codigo)}</p>
+            <h2 class="pcard__desc">${esc(nice(p.descripcion))}</h2>
+            <p class="pcard__meta"><b class="pcard__price">${eur(p.precio)}</b>${st ? `<span class="pcard__stock pcard__stock--${st[1]}">${st[0]}</span>` : ''}</p>
+          </div></li>`;
+      }).join('');
     }
 
     function paintLive() {
@@ -1048,7 +980,7 @@
       if (failing) { span.textContent = lastOk ? 'Sin conexión con el catálogo. Reintentando…' : 'No podemos cargar el catálogo. Reintentando…'; return; }
       if (!lastOk) return;
       const s = Math.round((Date.now() - lastOk) / 1000);
-      span.textContent = `Stock en directo · actualizado ${s < 5 ? 'ahora' : `hace ${s < 60 ? `${s} s` : `${Math.round(s / 60)} min`}`}`;
+      span.textContent = `Catálogo en directo · actualizado ${s < 5 ? 'ahora' : `hace ${s < 60 ? `${s} s` : `${Math.round(s / 60)} min`}`}`;
     }
 
     async function refresh() {
@@ -1056,267 +988,23 @@
         const r = await fetch('api/catalogo.php', { cache: 'no-store', headers: { Accept: 'application/json' } });
         const j = await r.json();
         if (!j.ok) throw new Error('catálogo');
-        prods = new Map(j.productos.map((p) => [p.codigo, p]));
+        prods = j.productos;
         lastOk = Date.now(); failing = false;
-        clampCart();
-        const s = JSON.stringify(j.productos) + JSON.stringify(cart);
-        if (s !== sig) { sig = s; renderFilters(); renderProducts(); renderCart(); }
+        const s = JSON.stringify(prods);
+        if (s !== sig) { sig = s; renderFilters(); renderProducts(); }
       } catch {
         failing = true;
-        if (!prods.size) list.innerHTML = '<li class="ped__nothing">No podemos cargar el catálogo ahora mismo. Lo seguimos intentando…</li>';
+        if (!prods.length) list.innerHTML = '<li class="ped__nothing">No podemos cargar el catálogo ahora mismo. Lo seguimos intentando…</li>';
       }
       paintLive();
     }
 
-    function add(c, n = 1) {
-      const p = prods.get(c);
-      if (!p) return;
-      const cur = cart[c]?.q || 0, max = p.quedan === null ? 50 : p.quedan;
-      const q = clamp(cur + n, 0, max);
-      if (q <= 0) delete cart[c]; else cart[c] = { q, p: cart[c]?.p || '' };
-      save(); sig = '';
-      renderProducts(); renderCart();
-    }
-
     filtersEl.addEventListener('click', (e) => { const b = e.target.closest('[data-f]'); if (!b) return; filter = b.dataset.f; renderFilters(); renderProducts(); });
-    list.addEventListener('click', (e) => {
-      const b = e.target.closest('[data-add]');
-      if (!b) return;
-      add(b.dataset.add);
-      notice('');
-      const btn = root.querySelector(`[data-add="${CSS.escape(b.dataset.add)}"]`);
-      if (btn && !btn.disabled) { btn.textContent = '¡Añadido!'; setTimeout(() => { if (btn.isConnected && !btn.disabled) btn.textContent = 'Añadir'; }, 1100); }
-    });
-    linesEl.addEventListener('click', (e) => {
-      const b = e.target.closest('[data-inc],[data-dec],[data-del]');
-      if (!b) return;
-      if (b.dataset.inc) add(b.dataset.inc, 1);
-      else if (b.dataset.dec) add(b.dataset.dec, -1);
-      else { delete cart[b.dataset.del]; save(); sig = ''; renderProducts(); renderCart(); }
-    });
-    linesEl.addEventListener('change', (e) => {
-      const q = e.target.closest('[data-qty]');
-      if (!q) return;
-      const c = q.dataset.qty, n = parseInt(q.value, 10);
-      add(c, (Number.isFinite(n) ? n : 1) - (cart[c]?.q || 0));
-    });
-    linesEl.addEventListener('input', (e) => {
-      const p = e.target.closest('[data-perso]');
-      if (p && cart[p.dataset.perso]) { cart[p.dataset.perso].p = p.value.slice(0, 200); save(); }
-    });
-
-    const showErr = (errs) => {
-      $$('[data-err]', form).forEach((p) => {
-        const k = p.dataset.err, m = errs[k] || '';
-        p.textContent = m;
-        const input = form.elements[k];
-        if (input && input.setAttribute) input.setAttribute('aria-invalid', m ? 'true' : 'false');
-      });
-      const first = Object.keys(errs).map((k) => form.elements[k]).find((el) => el && el.focus);
-      if (first) first.focus();
-    };
-
-    form.addEventListener('submit', async (ev) => {
-      ev.preventDefault();
-      msg.textContent = '';
-      const f = form.elements, e = {};
-      if (f.nombre.value.trim().length < 3) e.nombre = 'Escribe tu nombre y apellidos.';
-      if (!/^\+?[0-9 ]{9,18}$/.test(f.telefono.value.trim())) e.telefono = 'Escribe un teléfono de contacto (solo números).';
-      if (f.email.value.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(f.email.value.trim())) e.email = 'Revisa el correo electrónico.';
-      if (!Object.keys(cart).length) e.lineas = 'Añade al menos un producto del catálogo.';
-      if (!f.acepto.checked) e.acepto = 'Necesitamos tu conformidad para hacer el encargo.';
-      showErr(e);
-      if (Object.keys(e).length) { msg.textContent = 'Revisa los campos marcados.'; return; }
-      sendBtn.disabled = true; sendBtn.classList.add('is-busy');
-      try {
-        const r = await fetch('api/pedir.php', {
-          method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-          body: JSON.stringify({
-            nombre: f.nombre.value, telefono: f.telefono.value, email: f.email.value, direccion: f.direccion.value,
-            observaciones: f.observaciones.value, web: f.web.value, acepto: f.acepto.checked ? '1' : '', t: Date.now() - t0,
-            lineas: Object.entries(cart).map(([codigo, it]) => ({ codigo, cantidad: it.q, personalizacion: it.p || '' })),
-          }),
-        });
-        const j = await r.json().catch(() => ({}));
-        if (r.ok && j.ok) {
-          const nombre = (j.nombre || f.nombre.value).trim();
-          $('[data-ped-name]', done).textContent = nombre.split(' ')[0];
-          cart = {}; save(); sig = '';
-          form.hidden = true; done.hidden = false; bar.hidden = true;
-          ticket = ticketData(j, nombre);
-          showTicket(ticket);
-          done.focus();
-          done.scrollIntoView({ block: 'start', behavior: reduced() ? 'auto' : 'smooth' });
-          refresh();
-          return;
-        }
-        if (j.stock) {
-          Object.entries(j.stock).forEach(([c, s]) => { const p = prods.get(c); if (p) p.quedan = s.quedan; else delete cart[c]; });
-          clampCart(); sig = ''; renderProducts(); renderCart();
-        }
-        if (j.errores) showErr(j.errores);
-        msg.textContent = j.mensaje || 'No se ha podido enviar. Inténtalo de nuevo.';
-      } catch {
-        msg.textContent = 'No hay conexión. Revisa internet e inténtalo de nuevo.';
-      } finally {
-        sendBtn.disabled = false; sendBtn.classList.remove('is-busy');
-      }
-    });
-    /* --- Tique del encargo: mismo aspecto que «Eventos del día» --- */
-    const receiptEl = $('[data-ped-receipt]', root), printerEl = $('[data-ped-printer]', root);
-    let ticket = null;
-    const two = (n) => String(n).padStart(2, '0');
-    function ticketData(j, nombre) {
-      const n = new Date();
-      return {
-        code: j.codigo, total: j.total, nombre,
-        fecha: `${two(n.getDate())}/${two(n.getMonth() + 1)}/${n.getFullYear()} ${two(n.getHours())}:${two(n.getMinutes())}`,
-        lineas: (j.lineas || []).map((l) => ({ q: l.cantidad, d: nice(l.descripcion), c: l.codigo, u: l.precio, p: l.personalizacion || '' })),
-      };
-    }
-    function showTicket(t) {
-      const units = t.lineas.reduce((a, l) => a + l.q, 0);
-      receiptEl.innerHTML = `
-        <div class="r-head"><span class="r-word" role="img" aria-label="MercaBásica"></span>
-          <p>CIFP TONY GALLARDO<br>LAS PALMAS DE GRAN CANARIA</p>
-          <p class="r-row"><span>ENCARGO ${esc(t.code)}</span><span>${esc(t.fecha)}</span></p></div>
-        <hr class="r-rule r-rule--double">
-        <p class="r-row r-cols r-cols--buy"><span>UDS</span><span>CONCEPTO</span><span>IMPORTE</span></p>
-        <hr class="r-rule">
-        <ol class="r-list">${t.lineas.map((l) => `<li class="r-item r-item--buy"><b>${l.q}×</b><span>${esc(l.d)}<small>${esc(l.c)} · ${eur(l.u)}/ud.</small>${l.p ? `<small>✎ ${esc(l.p)}</small>` : ''}</span><b>${eur(l.u * l.q)}</b></li>`).join('')}</ol>
-        <hr class="r-rule">
-        <p class="r-row"><span>ARTÍCULOS</span><span>${units}</span></p>
-        <p class="r-row"><span>CLIENTE</span><span class="r-ell">${esc(t.nombre.toUpperCase())}</span></p>
-        <p class="r-row"><span>RECOGIDA</span><span>VIE 11/12/2026</span></p>
-        <p class="r-row"><span>ESTADO</span><span>PENDIENTE DE CONFIRMAR</span></p>
-        <hr class="r-rule r-rule--double">
-        <p class="r-row r-total"><span>TOTAL</span><span>${eur(t.total)}</span></p>
-        <p class="r-thanks">¡Gracias por su encargo!<br><span>Recogida en MercaBásica</span></p>
-        <svg class="r-barcode" preserveAspectRatio="none" aria-hidden="true"></svg>
-        <p class="r-code">${esc(t.code.replace('-', ' · '))}</p>`;
-      drawBarcode($('.r-barcode', receiptEl), t.code);
-      printerEl.classList.remove('is-printed');
-      void printerEl.offsetWidth;
-      requestAnimationFrame(() => printerEl.classList.add('is-printed'));
-    }
-
-    // Dibuja el tique en un lienzo (sin librerías) para descargarlo como PNG
-    async function ticketPNG(t) {
-      const S = 3, W = 400, P = 28, IN = 26, ink = '#1D1D24', soft = 'rgba(29,29,36,.6)';
-      await Promise.all(['400 13px "DM Mono"', '500 13px "DM Mono"'].map((f) => d.fonts.load(f).catch(() => null)));
-      const word = await new Promise((ok) => { const im = new Image(); im.onload = () => ok(im); im.onerror = () => ok(null); im.src = 'assets/img/wordmark-mask.webp'; });
-      const c = d.createElement('canvas'), x = c.getContext('2d');
-      const F = (sz, w = 400) => `${w} ${sz}px "DM Mono", ui-monospace, monospace`;
-      const tw = (s, f) => { x.font = f; return x.measureText(s).width; };
-      const wrap = (s, f, max) => {
-        const out = []; let cur = '';
-        s.split(' ').forEach((w) => { const t2 = cur ? `${cur} ${w}` : w; if (tw(t2, f) > max && cur) { out.push(cur); cur = w; } else cur = t2; });
-        if (cur) out.push(cur);
-        return out;
-      };
-      const fit = (s, f, max) => { if (tw(s, f) <= max) return s; while (s.length > 1 && tw(`${s}…`, f) > max) s = s.slice(0, -1); return `${s}…`; };
-      const L = P + IN, R = P + W - IN, CW = R - L, MID = P + W / 2, QW = 40;
-      const ops = [];
-      let y = P + 34;
-      const ww = CW * 0.76, wh = ww * 382 / 1209;
-      ops.push(['word', MID - ww / 2, y, ww, wh]); y += wh + 22;
-      ['CIFP TONY GALLARDO', 'LAS PALMAS DE GRAN CANARIA'].forEach((s) => { ops.push(['t', s, MID, y, F(13), 'center']); y += 19; });
-      y += 12; ops.push(['row', `ENCARGO ${t.code}`, t.fecha, y, F(13)]); y += 14;
-      ops.push(['dbl', y]); y += 22;
-      ops.push(['t', 'UDS', L, y, F(13, 500)], ['t', 'CONCEPTO', L + QW, y, F(13, 500)], ['t', 'IMPORTE', R, y, F(13, 500), 'right']); y += 12;
-      ops.push(['dash', y]); y += 24;
-      t.lineas.forEach((l) => {
-        const amt = eur(l.u * l.q), dw = CW - QW - tw(amt, F(13, 500)) - 14;
-        ops.push(['t', `${l.q}×`, L, y, F(13, 500)], ['t', amt, R, y, F(13, 500), 'right']);
-        wrap(l.d, F(13), dw).forEach((s, i) => ops.push(['t', s, L + QW, y + i * 19, F(13)]));
-        y += wrap(l.d, F(13), dw).length * 19;
-        ops.push(['t', `${l.c} · ${eur(l.u)}/ud.`, L + QW, y, F(11.5), 'left', soft]); y += 17;
-        if (l.p) wrap(`✎ ${l.p}`, F(11.5), dw).forEach((s) => { ops.push(['t', s, L + QW, y, F(11.5), 'left', soft]); y += 17; });
-        y += 9;
-      });
-      ops.push(['dash', y - 8]); y += 18;
-      const units = t.lineas.reduce((a, l) => a + l.q, 0);
-      [['ARTÍCULOS', String(units)], ['CLIENTE', t.nombre.toUpperCase()], ['RECOGIDA', 'VIE 11/12/2026'], ['ESTADO', 'PENDIENTE DE CONFIRMAR']].forEach(([a, b]) => { ops.push(['row', a, b, y, F(13)]); y += 21; });
-      y += 2; ops.push(['dbl', y]); y += 30;
-      ops.push(['row', 'TOTAL', eur(t.total), y, F(17, 500)]); y += 38;
-      ops.push(['t', '¡GRACIAS POR SU ENCARGO!', MID, y, F(13), 'center', ink, 2]); y += 19;
-      ops.push(['t', 'RECOGIDA EN MERCABÁSICA', MID, y, F(12), 'center', soft, 2]); y += 22;
-      ops.push(['bars', y]); y += 54 + 18;
-      ops.push(['t', t.code.replace('-', ' · '), MID, y, F(11.5), 'center', ink, 4]); y += 36;
-      const H = y;
-      c.width = (W + P * 2) * S; c.height = (H + P + 6) * S;
-      x.scale(S, S);
-      x.fillStyle = '#FBF6EC'; x.fillRect(0, 0, W + P * 2, H + P + 6);
-      // papel con borde dentado abajo
-      x.beginPath(); x.moveTo(P, P); x.lineTo(P + W, P); x.lineTo(P + W, H - 10);
-      for (let zx = P + W; zx > P; zx -= 18) { x.lineTo(Math.max(P, zx - 9), H); x.lineTo(Math.max(P, zx - 18), H - 10); }
-      x.closePath();
-      x.save(); x.shadowColor = 'rgba(80,60,10,.18)'; x.shadowBlur = 22; x.shadowOffsetY = 10; x.fillStyle = '#FFFEFA'; x.fill(); x.restore();
-      x.textBaseline = 'alphabetic';
-      ops.forEach((o) => {
-        const [k] = o;
-        if (k === 'word' && word) {
-          const oc = d.createElement('canvas'); oc.width = Math.round(o[3] * S); oc.height = Math.round(o[4] * S);
-          const ox = oc.getContext('2d'); ox.drawImage(word, 0, 0, oc.width, oc.height); ox.globalCompositeOperation = 'source-in'; ox.fillStyle = ink; ox.fillRect(0, 0, oc.width, oc.height);
-          x.drawImage(oc, o[1], o[2], o[3], o[4]);
-        } else if (k === 't') {
-          const [, s, tx, ty, f, al = 'left', col = ink, ls = 0] = o;
-          x.font = f; x.fillStyle = col; x.textAlign = al;
-          if ('letterSpacing' in x) x.letterSpacing = `${ls}px`;
-          x.fillText(s, tx, ty);
-          if ('letterSpacing' in x) x.letterSpacing = '0px';
-        } else if (k === 'row') {
-          const [, a, b, ty, f] = o;
-          x.font = f; x.fillStyle = ink; x.textAlign = 'left'; x.fillText(a, L, ty);
-          x.textAlign = 'right'; x.fillText(fit(b, f, CW - tw(a, f) - 18), R, ty);
-        } else if (k === 'dbl') {
-          x.fillStyle = ink; x.globalAlpha = 0.8; x.fillRect(L, o[1], CW, 1.2); x.fillRect(L, o[1] + 3.2, CW, 1.2); x.globalAlpha = 1;
-        } else if (k === 'dash') {
-          x.save(); x.strokeStyle = ink; x.globalAlpha = 0.7; x.lineWidth = 1.2; x.setLineDash([4, 3]); x.beginPath(); x.moveTo(L, o[1]); x.lineTo(R, o[1]); x.stroke(); x.restore();
-        } else if (k === 'bars') {
-          const { bars, w } = barBars(t.code), bw = CW * 0.78, k2 = bw / w, bx = MID - bw / 2;
-          x.fillStyle = ink; bars.forEach(([bx0, b]) => x.fillRect(bx + bx0 * k2, o[1], b * k2, 54));
-        }
-      });
-      return new Promise((ok) => c.toBlob(ok, 'image/png'));
-    }
-    $('[data-ped-png]', root).addEventListener('click', async (e) => {
-      if (!ticket) return;
-      const btn = e.currentTarget;
-      btn.disabled = true;
-      try {
-        const blob = await ticketPNG(ticket);
-        const a = d.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = `MercaBasica2026-${ticket.code}.png`;
-        d.body.append(a); a.click(); a.remove();
-        setTimeout(() => URL.revokeObjectURL(a.href), 4000);
-      } finally { btn.disabled = false; }
-    });
-    $('[data-ped-pdf]', root).addEventListener('click', () => {
-      if (!ticket) return;
-      printerEl.classList.add('is-printed');
-      d.body.classList.add('print-ticket');
-      const off = () => { d.body.classList.remove('print-ticket'); removeEventListener('afterprint', off); };
-      addEventListener('afterprint', off);
-      const old = d.title;
-      d.title = `MercaBasica2026-${ticket.code}`;
-      window.print();
-      d.title = old;
-      setTimeout(off, 1000);
-    });
-
-    $('[data-ped-again]', root).addEventListener('click', () => {
-      form.reset(); form.hidden = false; done.hidden = true; notice('');
-      renderProducts(); renderCart();
-      $('#p-nombre', form).focus();
-    });
-
-    renderCart();
     refresh();
     setInterval(() => { if (!d.hidden) refresh(); }, POLL);
     setInterval(paintLive, 5000);
     d.addEventListener('visibilitychange', () => { if (!d.hidden && Date.now() - lastOk > 8000) refresh(); });
+    try { localStorage.removeItem('mb26-encargo'); } catch { /* sin almacenamiento */ }
   }
 
   /* ------------------------------------------------------------------

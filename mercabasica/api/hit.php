@@ -9,7 +9,7 @@ header('Cache-Control: no-store');
 header('X-Robots-Tag: noindex, nofollow');
 
 const ALLOWED_HOST = 'myappsserver.duckdns.org';
-const PATHS   = ['/', '/index.html', '/inscripcion.html', '/pedidos.html', '/politica-privacidad.html', '/terminos.html'];
+const PATHS   = ['/', '/index.html', '/inscripcion.html', '/catalogo.html', '/politica-privacidad.html', '/terminos.html'];
 const EVENTS  = ['cta-calendario', 'mapa', 'google-calendar'];
 const DEVICES = ['m', 't', 'd'];
 const MAX_BODY = 600;           // bytes

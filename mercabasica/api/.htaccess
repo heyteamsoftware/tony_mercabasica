@@ -1,5 +1,5 @@
 # En /api solo se puede llamar a estos archivos (las librerías y data/ quedan cerradas)
-<FilesMatch "^(?!hit\.php$|stats\.php$|count\.php$|inscribir\.php$|admin\.php$|catalogo\.php$|pedir\.php$|pedidos-admin\.php$).*$">
+<FilesMatch "^(?!hit\.php$|stats\.php$|count\.php$|inscribir\.php$|admin\.php$|catalogo\.php$|pedidos-admin\.php$).*$">
   Require all denied
 </FilesMatch>
 Options -Indexes
