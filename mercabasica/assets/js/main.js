@@ -163,8 +163,8 @@
   const setSeg = (el, str) => { if (!el || el._v === str) return; el._v = str; el.innerHTML = [...str].map(digitSVG).join(''); };
   const pad = (n) => String(n).padStart(2, '0');
 
-  /* Cuenta atrás: 11/12/2026 09:00 en Canarias (UTC+0 en diciembre) */
-  const START = Date.UTC(2026, 11, 11, 9, 0);
+  /* Cuenta atrás: 11/12/2026 11:00 (apertura al público) en Canarias (UTC+0 en diciembre) */
+  const START = Date.UTC(2026, 11, 11, 11, 0);
   const END = Date.UTC(2026, 11, 11, 13, 30);
   const cd = $('[data-countdown]');
   if (cd) {
@@ -715,7 +715,7 @@
       'BEGIN:VEVENT',
       'UID:mercabasica-2026@cifp-tony-gallardo',
       'DTSTAMP:20261030T000000Z',
-      'DTSTART:20261211T090000Z',
+      'DTSTART:20261211T110000Z',
       'DTEND:20261211T133000Z',
       'SUMMARY:MercaBásica 2026',
       'LOCATION:CIFP Tony Gallardo\\, Ctra. de las Coloradas\\, 35009 Las Palmas de Gran Canaria',
