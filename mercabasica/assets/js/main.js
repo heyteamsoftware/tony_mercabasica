@@ -1162,7 +1162,7 @@
         sendBtn.disabled = false; sendBtn.classList.remove('is-busy');
       }
     });
-    /* --- Tique del encargo: mismo aspecto que «El tique del día» --- */
+    /* --- Tique del encargo: mismo aspecto que «Eventos del día» --- */
     const receiptEl = $('[data-ped-receipt]', root), printerEl = $('[data-ped-printer]', root);
     let ticket = null;
     const two = (n) => String(n).padStart(2, '0');

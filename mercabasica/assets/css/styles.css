@@ -1219,3 +1219,7 @@ p { text-wrap: pretty; }
   body.print-ticket .r-word { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   @page { margin: 12mm; }
 }
+/* Separador de partes en el tique de «Eventos del día» */
+.r-part { display: flex; align-items: center; gap: .7em; margin: .7em 0 .25em; font-weight: 500; letter-spacing: .22em; text-transform: uppercase; font-size: .86em; }
+.r-part::before, .r-part::after { content: ""; flex: 1; border-top: 1.5px dashed var(--ink); opacity: .45; }
+.r-list > .r-part:first-child { margin-top: .1em; }
